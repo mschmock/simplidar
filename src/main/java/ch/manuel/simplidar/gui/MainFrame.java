@@ -5,21 +5,37 @@
 package ch.manuel.simplidar.gui;
 
 import ch.manuel.simplidar.DataLoader;
+import ch.manuel.simplidar.RasterData;
+import ch.manuel.utilities.MyUtilities;
 
 
 public class MainFrame extends javax.swing.JFrame {
 
-    /**
-     * Creates new form MainFrame
-     */
+    // load and save
+    private static DataLoader loadObject;
+    // calculation
+    private static Thread t1;                   // LOAD file thread
+    
+    // CONSTRUCTOR
     public MainFrame() {
         initComponents();
+        // load object
+        loadObject = new DataLoader();
     }
     
     // PUBLIC FUNCTIONS
-    public static void setText(String txt) {
-        // set text in field
+    // set text in field
+    public static void setText(String txt) {        
         MainFrame.jTextArea1.setText(txt);
+    }
+    // show raster values
+    public static void showRasterValues() {
+        MainFrame.jTextField11.setText( String.valueOf(RasterData.getNbCols()) );
+        MainFrame.jTextField12.setText( String.valueOf(RasterData.getNbRows()) );
+        MainFrame.jTextField13.setText( String.valueOf(RasterData.getCellsize()) );
+        MainFrame.jTextField14.setText( String.valueOf(RasterData.getXLLcorner()) );
+        MainFrame.jTextField15.setText( String.valueOf(RasterData.getYLLcorner()) );
+        MainFrame.jTextField16.setText( String.valueOf(RasterData.getNoDataVal()) );
     }
 
     /**
@@ -34,20 +50,94 @@ public class MainFrame extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        jLabel16 = new javax.swing.JLabel();
+        jTextField11 = new javax.swing.JTextField();
+        jTextField12 = new javax.swing.JTextField();
+        jTextField13 = new javax.swing.JTextField();
+        jTextField14 = new javax.swing.JTextField();
+        jTextField15 = new javax.swing.JTextField();
+        jTextField16 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("simpLIDAR");
+        setPreferredSize(new java.awt.Dimension(700, 400));
+        setResizable(false);
 
-        jButton1.setText("Datei laden");
+        jButton1.setText("Datei wählen");
+        jButton1.setPreferredSize(new java.awt.Dimension(120, 32));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
+        jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
+        jTextArea1.setRows(4);
+        jTextArea1.setText("Status...");
         jScrollPane1.setViewportView(jTextArea1);
+
+        jButton2.setText("Daten laden");
+        jButton2.setPreferredSize(new java.awt.Dimension(120, 32));
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jButton3.setText("jButton3");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        jLabel1.setText("Daten Raster:");
+
+        jLabel11.setText("Anzahl Spalten:");
+
+        jLabel12.setText("Anzahl Reihen:");
+
+        jLabel13.setText("Rastergrösse:");
+
+        jLabel14.setText("Koordinate Xmin:");
+
+        jLabel15.setText("Koordinate Ymin:");
+
+        jLabel16.setText("NoData-Wert:");
+
+        jTextField11.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextField11.setDisabledTextColor(new java.awt.Color(204, 204, 204));
+        jTextField11.setEnabled(false);
+
+        jTextField12.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextField12.setDisabledTextColor(new java.awt.Color(204, 204, 204));
+        jTextField12.setEnabled(false);
+
+        jTextField13.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextField13.setDisabledTextColor(new java.awt.Color(204, 204, 204));
+        jTextField13.setEnabled(false);
+
+        jTextField14.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextField14.setDisabledTextColor(new java.awt.Color(204, 204, 204));
+        jTextField14.setEnabled(false);
+
+        jTextField15.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextField15.setDisabledTextColor(new java.awt.Color(204, 204, 204));
+        jTextField15.setEnabled(false);
+
+        jTextField16.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextField16.setDisabledTextColor(new java.awt.Color(204, 204, 204));
+        jTextField16.setEnabled(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -56,17 +146,71 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 437, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
-                .addContainerGap(321, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 365, Short.MAX_VALUE)
+                        .addComponent(jButton3))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel11)
+                                    .addComponent(jLabel12)
+                                    .addComponent(jLabel13)
+                                    .addComponent(jLabel14)
+                                    .addComponent(jLabel15)
+                                    .addComponent(jLabel16))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jTextField16, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jTextField15, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jTextField14, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jTextField13, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 223, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel12)
+                    .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel13)
+                    .addComponent(jTextField13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel14)
+                    .addComponent(jTextField14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel15)
+                    .addComponent(jTextField15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel16)
+                    .addComponent(jTextField16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton3))
                 .addContainerGap())
         );
 
@@ -74,15 +218,42 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // Load file
-        DataLoader.loadAscFile();
+        // Select file
+        DataLoader.selectAscFile();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // Load file
+        t1 = new Thread( loadObject );
+        t1.start();
+
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // LaF
+        MyUtilities.laf();
+    }//GEN-LAST:event_jButton3ActionPerformed
 
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private static javax.swing.JButton jButton1;
-    private javax.swing.JScrollPane jScrollPane1;
+    private static javax.swing.JButton jButton2;
+    private static javax.swing.JButton jButton3;
+    private static javax.swing.JLabel jLabel1;
+    private static javax.swing.JLabel jLabel11;
+    private static javax.swing.JLabel jLabel12;
+    private static javax.swing.JLabel jLabel13;
+    private static javax.swing.JLabel jLabel14;
+    private static javax.swing.JLabel jLabel15;
+    private static javax.swing.JLabel jLabel16;
+    private static javax.swing.JScrollPane jScrollPane1;
     private static javax.swing.JTextArea jTextArea1;
+    private static javax.swing.JTextField jTextField11;
+    private static javax.swing.JTextField jTextField12;
+    private static javax.swing.JTextField jTextField13;
+    private static javax.swing.JTextField jTextField14;
+    private static javax.swing.JTextField jTextField15;
+    private static javax.swing.JTextField jTextField16;
     // End of variables declaration//GEN-END:variables
 }

@@ -3,10 +3,16 @@
 
 package ch.manuel.utilities;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 //Klasse mit verschiedenen Hilfsmittel
 public class MyUtilities {
@@ -64,26 +70,25 @@ public class MyUtilities {
     
     //Look and Feel festlegen
     public static void setLaF(String lf){
-        //Setze das Look & Feel: "Windows" falls vorhanden
-        String lookandfeel = lf;     //Nimbus, Metal, Windows, Windows Classic, CDE/Motif
+        //Nimbus, Metal, Windows, Windows Classic, CDE/Motif
         boolean isSupported = false;        //Wird das gewünschte L&F unterstützt
         for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-            if (lookandfeel.equals(info.getName())) {
+            if (lf.equals(info.getName())) {
                 isSupported = true;
-                lookandfeel = info.getClassName();
+                lf = info.getClassName();
                 break;
             }
         }
         //System.out.println(UIManager.getLookAndFeel().getName());
         try {
             if (isSupported){
-                UIManager.setLookAndFeel(lookandfeel);
+                UIManager.setLookAndFeel(lf);
             }
             else{
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             }
-        } catch (Exception e) {
-            // If Nimbus is not available, you can set the GUI to another look and feel.
+        } catch (Exception ex) { 
+            Logger.getLogger(MyUtilities.class.getName()).log(Level.SEVERE, null, ex);
         }
         //System.out.println(UIManager.getLookAndFeel().getName());
     }
@@ -156,16 +161,24 @@ public class MyUtilities {
     }
     
     // Dialog zum Speichern der Datei (wird von der Methode "saveFile()" aufgerufen
-    public static String getOpenFileDialog(java.awt.Frame f, String title, String defDir, String fileType) {
-        java.awt.FileDialog fd = new java.awt.FileDialog(f, title, java.awt.FileDialog.LOAD);
-        fd.setFile(fileType);
-        fd.setDirectory(defDir);
-        fd.setLocation(50, 50);
-        fd.setVisible(true);
-        if( fd.getFile() == null ) {
-            return null;
+    public static String getOpenFileDialog(String title, String defDir) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle(title);
+        fileChooser.setCurrentDirectory(new File( defDir ));
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY );
+ 
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("ASC Files", "asc"));
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("xyz Files", "xyz", "txt"));
+ 
+        fileChooser.setAcceptAllFileFilterUsed(true);
+ 
+        int result = fileChooser.showOpenDialog(null);
+ 
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            return selectedFile.getAbsolutePath();
         } else {
-            return fd.getDirectory() + fd.getFile();
+            return null;
         }
     }
     
