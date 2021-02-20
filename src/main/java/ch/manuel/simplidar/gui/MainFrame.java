@@ -5,8 +5,12 @@
 package ch.manuel.simplidar.gui;
 
 import ch.manuel.simplidar.DataLoader;
-import ch.manuel.simplidar.RasterData;
+import ch.manuel.simplidar.calculation.Calculation;
+import ch.manuel.simplidar.raster.DataManager;
 import ch.manuel.utilities.MyUtilities;
+import java.text.DecimalFormat;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 
 
 public class MainFrame extends javax.swing.JFrame {
@@ -30,12 +34,23 @@ public class MainFrame extends javax.swing.JFrame {
     }
     // show raster values
     public static void showRasterValues() {
-        MainFrame.jTextField11.setText( String.valueOf(RasterData.getNbCols()) );
-        MainFrame.jTextField12.setText( String.valueOf(RasterData.getNbRows()) );
-        MainFrame.jTextField13.setText( String.valueOf(RasterData.getCellsize()) );
-        MainFrame.jTextField14.setText( String.valueOf(RasterData.getXLLcorner()) );
-        MainFrame.jTextField15.setText( String.valueOf(RasterData.getYLLcorner()) );
-        MainFrame.jTextField16.setText( String.valueOf(RasterData.getNoDataVal()) );
+        DecimalFormat myFormatter = new DecimalFormat("###,###");
+        String nbCols = myFormatter.format(DataManager.mainRaster.getNbCols());
+        String nbRows = myFormatter.format(DataManager.mainRaster.getNbRows());
+        String xllcorner = myFormatter.format(DataManager.mainRaster.getXLLcorner());
+        String yllcorner = myFormatter.format(DataManager.mainRaster.getYLLcorner());
+        
+        MainFrame.jTextField11.setText( nbCols );
+        MainFrame.jTextField12.setText( nbRows );
+        MainFrame.jTextField13.setText(String.valueOf(DataManager.mainRaster.getCellsize()) );
+        MainFrame.jTextField14.setText( xllcorner );
+        MainFrame.jTextField15.setText( yllcorner );
+        MainFrame.jTextField16.setText(String.valueOf(DataManager.mainRaster.getNoDataVal()) );
+        // set spinner values
+        SpinnerModel sm = new SpinnerNumberModel(1, 1, DataManager.mainRaster.getNbCols(), 1);  //default value,lower bound,upper bound,increment by
+        MainFrame.jSpinner21.setModel(sm);
+        sm = new SpinnerNumberModel(1, 1, DataManager.mainRaster.getNbRows(), 1);               //default value,lower bound,upper bound,increment by
+        MainFrame.jSpinner22.setModel(sm);
     }
 
     /**
@@ -65,10 +80,13 @@ public class MainFrame extends javax.swing.JFrame {
         jTextField14 = new javax.swing.JTextField();
         jTextField15 = new javax.swing.JTextField();
         jTextField16 = new javax.swing.JTextField();
+        jLabel21 = new javax.swing.JLabel();
+        jLabel22 = new javax.swing.JLabel();
+        jSpinner21 = new javax.swing.JSpinner();
+        jSpinner22 = new javax.swing.JSpinner();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("simpLIDAR");
-        setPreferredSize(new java.awt.Dimension(700, 400));
         setResizable(false);
 
         jButton1.setText("Datei wählen");
@@ -93,7 +111,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        jButton3.setText("jButton3");
+        jButton3.setText("Berechnen");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -117,27 +135,29 @@ public class MainFrame extends javax.swing.JFrame {
 
         jTextField11.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jTextField11.setDisabledTextColor(new java.awt.Color(204, 204, 204));
-        jTextField11.setEnabled(false);
 
         jTextField12.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jTextField12.setDisabledTextColor(new java.awt.Color(204, 204, 204));
-        jTextField12.setEnabled(false);
 
         jTextField13.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jTextField13.setDisabledTextColor(new java.awt.Color(204, 204, 204));
-        jTextField13.setEnabled(false);
 
         jTextField14.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jTextField14.setDisabledTextColor(new java.awt.Color(204, 204, 204));
-        jTextField14.setEnabled(false);
 
         jTextField15.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jTextField15.setDisabledTextColor(new java.awt.Color(204, 204, 204));
-        jTextField15.setEnabled(false);
 
         jTextField16.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jTextField16.setDisabledTextColor(new java.awt.Color(204, 204, 204));
-        jTextField16.setEnabled(false);
+
+        jLabel21.setText("Spalte wählen");
+
+        jLabel22.setText("Reihe wählen:");
+
+        jSpinner21.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
+
+        jSpinner22.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -150,7 +170,7 @@ public class MainFrame extends javax.swing.JFrame {
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 365, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 350, Short.MAX_VALUE)
                         .addComponent(jButton3))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -170,9 +190,19 @@ public class MainFrame extends javax.swing.JFrame {
                                     .addComponent(jTextField15, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jTextField14, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jTextField13, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGap(97, 97, 97)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel22)
+                                            .addComponent(jLabel21))
+                                        .addGap(38, 38, 38)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jSpinner21, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jSpinner22, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                        .addGap(0, 158, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -183,11 +213,15 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
-                    .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel21)
+                    .addComponent(jSpinner21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
-                    .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel22)
+                    .addComponent(jSpinner22, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel13)
@@ -205,7 +239,7 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jLabel16)
                     .addComponent(jTextField16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -230,8 +264,11 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // LaF
-        MyUtilities.laf();
+        // TEST
+        int x = (int) MainFrame.jSpinner21.getModel().getValue();
+        int y = (int) MainFrame.jSpinner22.getModel().getValue();
+        
+        Calculation.testCalc(x, y);
     }//GEN-LAST:event_jButton3ActionPerformed
 
 
@@ -247,7 +284,11 @@ public class MainFrame extends javax.swing.JFrame {
     private static javax.swing.JLabel jLabel14;
     private static javax.swing.JLabel jLabel15;
     private static javax.swing.JLabel jLabel16;
+    private static javax.swing.JLabel jLabel21;
+    private static javax.swing.JLabel jLabel22;
     private static javax.swing.JScrollPane jScrollPane1;
+    private static javax.swing.JSpinner jSpinner21;
+    private static javax.swing.JSpinner jSpinner22;
     private static javax.swing.JTextArea jTextArea1;
     private static javax.swing.JTextField jTextField11;
     private static javax.swing.JTextField jTextField12;

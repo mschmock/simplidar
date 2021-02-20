@@ -6,6 +6,7 @@ package ch.manuel.simplidar;
 
 // load lidar-datas from asc-file
 
+import ch.manuel.simplidar.raster.DataManager;
 import ch.manuel.simplidar.gui.MainFrame;
 import ch.manuel.utilities.MyUtilities;
 import java.io.BufferedReader;
@@ -32,7 +33,7 @@ public class DataLoader implements Runnable{
     
     // set path to asc-file
     public static void selectAscFile() {
-        String path = MyUtilities.getOpenFileDialog("Datei öffnen", "");
+        String path = MyUtilities.getOpenFileDialog("Datei öffnen", "D:\\Temp\\LIDAR\\LV95\\data_asc");
         if( path != null ) {
             DataLoader.ascFile = new File( path );
             // check file header
@@ -45,9 +46,14 @@ public class DataLoader implements Runnable{
     // load file
     private static void loadAscFile() {
         // init Raster
-        RasterData.initRaster();
+        boolean isOK = DataManager.mainRaster.initRaster();
         // load file
-        DataLoader.readFile( false );
+        if( isOK ) {
+            DataLoader.readFile( false );
+        }else {
+            // show text in gui
+            MainFrame.setText("Datenfeld kann nicht initialisiert werden");
+        }
     }
     
     // check header of file
@@ -81,7 +87,7 @@ public class DataLoader implements Runnable{
             // ____2. WHOLE FILE    
             // read the whole file
             } else {
-                int nbLinesExp = RasterData.getNbRows();
+                int nbLinesExp = DataManager.mainRaster.getNbRows();
                 
                 // line by line
                 while( (line = br.readLine() ) != null ) {
@@ -90,22 +96,24 @@ public class DataLoader implements Runnable{
                     
                     if( MyUtilities.isNumeric( substr[0] )) {
                         // check expected nb of elements
-                        if( substr.length == RasterData.getNbCols() ) {
+                        if( substr.length == DataManager.mainRaster.getNbCols() ) {
                             for( int i = 0; i < substr.length; i++) {
-                                RasterData.setElement(nbLines, i, Double.parseDouble( substr[i] ));
+                                DataManager.mainRaster.setElement(nbLines, i, Double.parseDouble( substr[i] ));
                             }
                         }
-                        // show process
+                        // show progress
                         MainFrame.setText("Fortschritt: " + (int)(++nbLines*100.0/nbLinesExp) + " %");
-                    }
-                    
-                    if( nbLines != RasterData.getNbRows() ) {
-                        // error
-                        fileOK = false;
-                        errMsg = "Datei ist nicht korrekt formatiert!";
-                    }
-                        
+                    }     
                 }
+                // test
+                //System.out.println("Linien: " +nbLines);
+                    
+                if( nbLines != DataManager.mainRaster.getNbRows() ) {
+                    // error
+                    fileOK = false;
+                    errMsg = "Datei ist nicht korrekt formatiert!";
+                }
+                  
             }
             
             br.close();
@@ -134,13 +142,13 @@ Header Format:
     nodata_value 0
 */
         // check for "ncols"
-        System.out.println( line + ": " + line.contains("ncols") );
+        // System.out.println( line + ": " + line.contains("ncols") );
         if( line.contains("ncols") ) {
             // check value: Numeric int value on 2. position
             int val = testLnInt( line );
             // if value ok -> write to class RasterData
             if( val != 0 ) {  
-                RasterData.setNbCols( val );
+                DataManager.mainRaster.setNbCols( val );
             }
         }
         // check for "nrows"
@@ -149,7 +157,7 @@ Header Format:
             int val = testLnInt( line );
             // if value ok -> write to class RasterData
             if( val != 0 ) {  
-                RasterData.setNbRows( val );
+                DataManager.mainRaster.setNbRows( val );
             }
         }
         // check for "xllcorner"
@@ -158,7 +166,7 @@ Header Format:
             int val = testLnInt( line );
             // if value ok -> write to class RasterData
             if( val != 0 ) { 
-                RasterData.setXLLcorner( val );
+                DataManager.mainRaster.setXLLcorner( val );
             }
         }
         // check for "yllcorner"
@@ -167,7 +175,7 @@ Header Format:
             int val = testLnInt( line );
             // if value ok -> write to class RasterData
             if( val != 0 ) { 
-                RasterData.setYLLcorner( val );
+                DataManager.mainRaster.setYLLcorner( val );
             }
         }
         // check for "cellsize"
@@ -176,7 +184,7 @@ Header Format:
             double val = testLnDouble( line );
             // if value ok -> write to class RasterData
             if( val != 0 ) { 
-                RasterData.setCellsize( val );
+                DataManager.mainRaster.setCellsize( val );
             }        
         }
         // check for "nodata_value"
@@ -185,7 +193,7 @@ Header Format:
             int val = testLnInt( line );
             // if value ok -> write to class RasterData
             if( val != 0 ) { 
-                RasterData.setNoDataVal( val );
+                DataManager.mainRaster.setNoDataVal( val );
             }
         }
         
