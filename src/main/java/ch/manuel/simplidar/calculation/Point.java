@@ -4,6 +4,7 @@
 
 package ch.manuel.simplidar.calculation;
 
+// simple Point Class
 
 public class Point {
     // class attributes
