@@ -112,6 +112,8 @@ public class DataLoader implements Runnable{
                     // error
                     fileOK = false;
                     errMsg = "Datei ist nicht korrekt formatiert!";
+                } else {
+                    errMsg += "\nLaden abgeschlossen.";
                 }
                   
             }
