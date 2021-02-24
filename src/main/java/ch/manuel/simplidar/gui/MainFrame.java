@@ -1,17 +1,13 @@
 //Autor: Manuel Schmocker
 //Datum: 13.02.2021
-
-
 package ch.manuel.simplidar.gui;
 
 import ch.manuel.simplidar.DataLoader;
 import ch.manuel.simplidar.calculation.Calculation;
 import ch.manuel.simplidar.raster.DataManager;
-import ch.manuel.utilities.MyUtilities;
 import java.text.DecimalFormat;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
-
 
 public class MainFrame extends javax.swing.JFrame {
 
@@ -19,19 +15,22 @@ public class MainFrame extends javax.swing.JFrame {
     private static DataLoader loadObject;
     // calculation
     private static Thread t1;                   // LOAD file thread
-    
+    // frame: "analyseFrame"
+    private static AnalyseFrame aFrame;
+
     // CONSTRUCTOR
     public MainFrame() {
         initComponents();
         // load object
         loadObject = new DataLoader();
     }
-    
+
     // PUBLIC FUNCTIONS
     // set text in field
-    public static void setText(String txt) {        
+    public static void setText(String txt) {
         MainFrame.jTextArea1.setText(txt);
     }
+
     // show raster values
     public static void showRasterValues() {
         DecimalFormat myFormatter = new DecimalFormat("###,###");
@@ -39,13 +38,13 @@ public class MainFrame extends javax.swing.JFrame {
         String nbRows = myFormatter.format(DataManager.mainRaster.getNbRows());
         String xllcorner = myFormatter.format(DataManager.mainRaster.getXLLcorner());
         String yllcorner = myFormatter.format(DataManager.mainRaster.getYLLcorner());
-        
-        MainFrame.jTextField11.setText( nbCols );
-        MainFrame.jTextField12.setText( nbRows );
-        MainFrame.jTextField13.setText(String.valueOf(DataManager.mainRaster.getCellsize()) );
-        MainFrame.jTextField14.setText( xllcorner );
-        MainFrame.jTextField15.setText( yllcorner );
-        MainFrame.jTextField16.setText(String.valueOf(DataManager.mainRaster.getNoDataVal()) );
+
+        MainFrame.jTextField11.setText(nbCols);
+        MainFrame.jTextField12.setText(nbRows);
+        MainFrame.jTextField13.setText(String.valueOf(DataManager.mainRaster.getCellsize()));
+        MainFrame.jTextField14.setText(xllcorner);
+        MainFrame.jTextField15.setText(yllcorner);
+        MainFrame.jTextField16.setText(String.valueOf(DataManager.mainRaster.getNoDataVal()));
         // set spinner values
         SpinnerModel sm = new SpinnerNumberModel(1, 1, DataManager.mainRaster.getNbCols(), 1);  //default value,lower bound,upper bound,increment by
         MainFrame.jSpinner21.setModel(sm);
@@ -67,7 +66,6 @@ public class MainFrame extends javax.swing.JFrame {
         jTextArea1 = new javax.swing.JTextArea();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
@@ -84,6 +82,11 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel22 = new javax.swing.JLabel();
         jSpinner21 = new javax.swing.JSpinner();
         jSpinner22 = new javax.swing.JSpinner();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("simpLIDAR");
@@ -117,9 +120,6 @@ public class MainFrame extends javax.swing.JFrame {
                 jButton3ActionPerformed(evt);
             }
         });
-
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        jLabel1.setText("Daten Raster:");
 
         jLabel11.setText("Anzahl Spalten:");
 
@@ -159,6 +159,27 @@ public class MainFrame extends javax.swing.JFrame {
 
         jSpinner22.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
 
+        jMenu1.setText("Datei");
+
+        jMenuItem1.setText("ASC-File laden");
+        jMenu1.add(jMenuItem1);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Analyse");
+
+        jMenuItem2.setText("Daten Viewer");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem2);
+
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -174,7 +195,6 @@ public class MainFrame extends javax.swing.JFrame {
                         .addComponent(jButton3))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -209,8 +229,6 @@ public class MainFrame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
                     .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -239,7 +257,7 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jLabel16)
                     .addComponent(jTextField16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -258,7 +276,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // Load file
-        t1 = new Thread( loadObject );
+        t1 = new Thread(loadObject);
         t1.start();
 
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -267,17 +285,20 @@ public class MainFrame extends javax.swing.JFrame {
         // TEST
         int x = (int) MainFrame.jSpinner21.getModel().getValue();
         int y = (int) MainFrame.jSpinner22.getModel().getValue();
-        
+
         Calculation.testCalc(x, y);
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // show AnalyseFrame
+        MainFrame.openAnalyseFrame();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private static javax.swing.JButton jButton1;
     private static javax.swing.JButton jButton2;
     private static javax.swing.JButton jButton3;
-    private static javax.swing.JLabel jLabel1;
     private static javax.swing.JLabel jLabel11;
     private static javax.swing.JLabel jLabel12;
     private static javax.swing.JLabel jLabel13;
@@ -286,6 +307,11 @@ public class MainFrame extends javax.swing.JFrame {
     private static javax.swing.JLabel jLabel16;
     private static javax.swing.JLabel jLabel21;
     private static javax.swing.JLabel jLabel22;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private static javax.swing.JScrollPane jScrollPane1;
     private static javax.swing.JSpinner jSpinner21;
     private static javax.swing.JSpinner jSpinner22;
@@ -297,4 +323,16 @@ public class MainFrame extends javax.swing.JFrame {
     private static javax.swing.JTextField jTextField15;
     private static javax.swing.JTextField jTextField16;
     // End of variables declaration//GEN-END:variables
+
+    // PUBLIC FUNCTIONS
+    // open frame "AnalyseFrame"
+    private static void openAnalyseFrame() {
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                aFrame = new AnalyseFrame();
+                aFrame.setVisible(true);
+            }
+        });
+    }
 }

@@ -37,10 +37,18 @@ public class DataManager {
         // cluster for mainRaster
 
     }
-    
+
     // GETTER
-    public static Cluster getElement(int i, int j){
+    public static Cluster getElement(int i, int j) {
         return mainCluster[i][j];
+    }
+
+    public static int getClusterSizeX() {
+        return sizeCluX;
+    }
+
+    public static int getClusterSizeY() {
+        return sizeCluY;
     }
 
     // PUBLIC FUNCTIONS
@@ -50,6 +58,18 @@ public class DataManager {
         sizeCluY = mainRaster.getNbRows() / size;
 
         mainCluster = new Cluster[sizeCluX][sizeCluY];
-        mainCluster[0][0] = new Cluster(0,0,10);
+        
     }
+    // analyse cluster
+    public static void analyseCluster() {
+        for (int i = 0; i < sizeCluX; i++) {
+            for (int j = 0; j < sizeCluY; j++) {
+                int colIndex = i*size;
+                int rowIndex = j*size;
+                // analyse starts with calling the constructor
+                mainCluster[i][j] = new Cluster(colIndex, rowIndex, size);
+            }
+        }
+    }
+    
 }
