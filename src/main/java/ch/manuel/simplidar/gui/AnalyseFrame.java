@@ -5,16 +5,16 @@
  */
 package ch.manuel.simplidar.gui;
 
-import ch.manuel.simplidar.raster.Cluster;
 import ch.manuel.simplidar.raster.DataManager;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import javax.swing.JPanel;
 
 public class AnalyseFrame extends javax.swing.JFrame {
 
     // class attributes
     private static BufferedImage image;
+    // calculation
+    private static Thread t1;
 
     public AnalyseFrame() {
         initComponents();
@@ -24,39 +24,35 @@ public class AnalyseFrame extends javax.swing.JFrame {
         int sizeX = DataManager.getClusterSizeX();
         int sizeY = DataManager.getClusterSizeY();
         image = new BufferedImage(sizeX, sizeY, BufferedImage.TYPE_INT_ARGB);    //Bild erstellen
-
+        
+        // init image
         setPixels();
 
     }
 
+    // PUBLIC FUNCTIONS
+    // set text in field
+    public static void setProgress(int val) {
+        AnalyseFrame.jProgressBar1.setValue(val);
+    }
+    public static void repaintImg() {
+        AnalyseFrame.imgPanel.repaint();
+    }
+ 
     // GETTER
     public static BufferedImage getImg() {
         return image;
     }
 
     // PRIVATE FUNCTION
-    // test image
+    // fill image white
     private static void setPixels() {
         int sizeX = DataManager.getClusterSizeX();
         int sizeY = DataManager.getClusterSizeY();
         //Pixel einfärben
         for (int i = 0; i < sizeX; i++) {
             for (int j = 0; j < sizeY; j++) {
-
-                image.setRGB(i, j, new Color(134, 255 * i / sizeX, 255 * j / sizeY).getRGB());
-            }
-        }
-    }
-    
-    private static void showResult() {
-        int sizeX = DataManager.getClusterSizeX();
-        int sizeY = DataManager.getClusterSizeY();
-        for (int i = 0; i < sizeX; i++) {
-            for (int j = 0; j < sizeY; j++) {
-                
-                int incl = (int) ( 255*DataManager.getElement(i, j).getInclination()/(Math.PI));
-                int col = new Color(134, incl, 145).getRGB();
-                image.setRGB(i, j, col);
+                image.setRGB(i, j, Color.white.getRGB());
             }
         }
     }
@@ -70,21 +66,23 @@ public class AnalyseFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new imgPanel();
+        imgPanel = new imgPanel();
         jButton1 = new javax.swing.JButton();
         jProgressBar1 = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Data Viewer");
+        setMinimumSize(new java.awt.Dimension(500, 300));
+        setPreferredSize(new java.awt.Dimension(500, 300));
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout imgPanelLayout = new javax.swing.GroupLayout(imgPanel);
+        imgPanel.setLayout(imgPanelLayout);
+        imgPanelLayout.setHorizontalGroup(
+            imgPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 498, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        imgPanelLayout.setVerticalGroup(
+            imgPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 250, Short.MAX_VALUE)
         );
 
@@ -99,21 +97,22 @@ public class AnalyseFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(imgPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(jButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(imgPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton1)
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -121,14 +120,15 @@ public class AnalyseFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        DataManager.analyseCluster();
-        showResult();
+        // Load file
+        t1 = new Thread(DataManager.analyser);
+        t1.start();
     }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private static javax.swing.JPanel imgPanel;
     private static javax.swing.JButton jButton1;
-    private static javax.swing.JPanel jPanel1;
-    private javax.swing.JProgressBar jProgressBar1;
+    private static javax.swing.JProgressBar jProgressBar1;
     // End of variables declaration//GEN-END:variables
 }

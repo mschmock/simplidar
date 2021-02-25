@@ -1,6 +1,10 @@
 //Autor: Manuel Schmocker
 //Datum: 13.02.2021
+
 package ch.manuel.simplidar.raster;
+
+import ch.manuel.simplidar.calculation.RasterAnalyser;
+import ch.manuel.simplidar.gui.AnalyseFrame;
 
 /*
 Header Format:
@@ -26,6 +30,9 @@ public class DataManager {
     private static int sizeCluY;
     private static Cluster[][] mainCluster;
 
+    // rasterAnalyser object
+    public static RasterAnalyser analyser;
+    
     // Constructor
     public DataManager() {
         // datas from raster
@@ -34,8 +41,8 @@ public class DataManager {
         subRaster_2 = new Raster();
         subRaster_3 = new Raster();
         subRaster_4 = new Raster();
-        // cluster for mainRaster
-
+        // analyser
+        analyser = new RasterAnalyser();
     }
 
     // GETTER
@@ -69,7 +76,11 @@ public class DataManager {
                 // analyse starts with calling the constructor
                 mainCluster[i][j] = new Cluster(colIndex, rowIndex, size);
             }
+            // update progressbar
+            AnalyseFrame.setProgress(100*i/sizeCluX);
         }
+        // loading completed: set progressbar back to 0
+        AnalyseFrame.setProgress(0);
     }
     
 }
