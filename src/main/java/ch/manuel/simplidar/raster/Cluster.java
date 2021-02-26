@@ -14,10 +14,12 @@ import org.apache.commons.math3.linear.RealVector;
 public class Cluster {
 
     // class attributes
-    private int colorPixel;         // color of pixel (cluster element)
     private Vector3D normal;        // normal to cluster (regression)
     private double inclination;     // Neigung von Horizontale
+    private double inclSunbeam;      // Neigung zum Vektor SUNBEAM
     private double orientation;     // angle direction N-E-S-W
+    // vector sunbeam
+    private static Vector3D sunbeam;
     // raster index
     private int colIndex;
     private int rowIndex;
@@ -28,19 +30,56 @@ public class Cluster {
         this.colIndex = x;
         this.rowIndex = y;
         this.size = size;
-        // normal of cluster
+        // sunbeam default
+        Cluster.sunbeam = new Vector3D(-1 ,-1, 1).normalize();
+        // calculate geometric properties
         this.normalOfCluster();
         this.calcInclination();
+        this.calcInclSunbeam();
+        this.calcOrientation();
     }
 
     // GETTER
     public Vector3D getNormal() {
         return this.normal;
     }
-    public double getInclination() {
-        return this.inclination;
+
+    // inclination in degrees (0° = vertical, 0° - 90°)
+    public float getInclinDEG() {
+        return ((float) (this.inclination / Math.PI)) * 180.0f;
+    }
+    // inclination in degrees (0° = parallel to beam, 0° - 180°)
+    public float getInclinSunDEG() {
+        
+        return ((float) (this.inclSunbeam / Math.PI)) * 180.0f;
     }
 
+    // orientation (0° = North)
+    public float getOrientEG() {
+        float deg = ((float) (this.orientation / Math.PI)) * 180.0f;
+        if (deg > 90.0) {
+            return 450.0f - deg;
+        } else {
+            return 90.0f - deg;
+        }
+    }
+    // PUBLIC FUNCTIONS
+    public static void setSunbeamDirection(int degree) {
+        if (degree > 90) {
+            degree = 450 - degree;
+        } else {
+            degree =  90 - degree;
+        }
+        double x = Math.sin(degree*Math.PI/180.0);
+        double y = Math.cos(degree*Math.PI/180.0);
+        
+        Cluster.sunbeam = new Vector3D(x ,y, 0.75).normalize();
+    }
+    // recalculate sunbeam incl
+    public void recalcInclSun() {
+        calcInclSunbeam();
+    }
+    
     // PRIVATE FUNCTIONS
     // get normal of a cluster (by linear regression)
     // A * u = b
@@ -90,12 +129,24 @@ public class Cluster {
         return solver.solve(ATb);
 
     }
-    
+
     // calculate inclination
     private void calcInclination() {
         Vector3D ez = new Vector3D(0, 0, 1);
-        
-        inclination = Math.acos( this.normal.dotProduct(ez) );
+
+        inclination = Math.acos(this.normal.dotProduct(ez));
+    }
+    
+    // calculate angle of vector SUNBEAM
+    private void calcInclSunbeam() {
+        inclSunbeam = Math.acos(this.normal.dotProduct(Cluster.sunbeam));
+    }
+
+    // calculate orientation in x - y plane
+    private void calcOrientation() {
+        double x = this.normal.getX();
+        double y = this.normal.getY();
+        this.orientation = Math.atan2(y, x);
     }
 
 }

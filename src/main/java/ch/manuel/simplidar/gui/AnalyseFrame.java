@@ -5,6 +5,7 @@
  */
 package ch.manuel.simplidar.gui;
 
+import ch.manuel.simplidar.calculation.RasterAnalyser;
 import ch.manuel.simplidar.raster.DataManager;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -24,7 +25,7 @@ public class AnalyseFrame extends javax.swing.JFrame {
         int sizeX = DataManager.getClusterSizeX();
         int sizeY = DataManager.getClusterSizeY();
         image = new BufferedImage(sizeX, sizeY, BufferedImage.TYPE_INT_ARGB);    //Bild erstellen
-        
+
         // init image
         setPixels();
 
@@ -35,10 +36,11 @@ public class AnalyseFrame extends javax.swing.JFrame {
     public static void setProgress(int val) {
         AnalyseFrame.jProgressBar1.setValue(val);
     }
+
     public static void repaintImg() {
         AnalyseFrame.imgPanel.repaint();
     }
- 
+
     // GETTER
     public static BufferedImage getImg() {
         return image;
@@ -69,21 +71,24 @@ public class AnalyseFrame extends javax.swing.JFrame {
         imgPanel = new imgPanel();
         jButton1 = new javax.swing.JButton();
         jProgressBar1 = new javax.swing.JProgressBar();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        jSlider1 = new javax.swing.JSlider();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Data Viewer");
-        setMinimumSize(new java.awt.Dimension(500, 300));
-        setPreferredSize(new java.awt.Dimension(500, 300));
+        setMinimumSize(new java.awt.Dimension(500, 320));
+        setPreferredSize(new java.awt.Dimension(500, 320));
 
         javax.swing.GroupLayout imgPanelLayout = new javax.swing.GroupLayout(imgPanel);
         imgPanel.setLayout(imgPanelLayout);
         imgPanelLayout.setHorizontalGroup(
             imgPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 498, Short.MAX_VALUE)
+            .addGap(0, 500, Short.MAX_VALUE)
         );
         imgPanelLayout.setVerticalGroup(
             imgPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 250, Short.MAX_VALUE)
+            .addGap(0, 246, Short.MAX_VALUE)
         );
 
         jButton1.setText("Analyse");
@@ -93,6 +98,24 @@ public class AnalyseFrame extends javax.swing.JFrame {
             }
         });
 
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Relief Licht Top", "Relief Licht SW", "Ausrichtung", "Rauigkeit" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+
+        jSlider1.setMajorTickSpacing(90);
+        jSlider1.setMaximum(359);
+        jSlider1.setValue(225);
+        jSlider1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSlider1StateChanged(evt);
+            }
+        });
+
+        jLabel1.setText("Beliechtung");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -100,19 +123,33 @@ public class AnalyseFrame extends javax.swing.JFrame {
             .addComponent(imgPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(imgPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1)
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel1)
+                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jProgressBar1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
 
@@ -125,10 +162,22 @@ public class AnalyseFrame extends javax.swing.JFrame {
         t1.start();
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // update image
+        RasterAnalyser.updateImg(jComboBox1.getSelectedIndex());
+    }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void jSlider1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider1StateChanged
+        RasterAnalyser.updateImg2(jSlider1.getValue());
+    }//GEN-LAST:event_jSlider1StateChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private static javax.swing.JPanel imgPanel;
     private static javax.swing.JButton jButton1;
+    private static javax.swing.JComboBox<String> jComboBox1;
+    private static javax.swing.JLabel jLabel1;
     private static javax.swing.JProgressBar jProgressBar1;
+    private static javax.swing.JSlider jSlider1;
     // End of variables declaration//GEN-END:variables
 }

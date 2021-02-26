@@ -14,7 +14,7 @@ Header Format:
     yllcorner 1173000
     cellsize 0.5
     nodata_value 0
- */
+*/
 public class DataManager {
 
     // raster objects

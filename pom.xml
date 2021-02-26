@@ -22,7 +22,7 @@
                 </descriptorRefs>
                <archive>
                     <manifest>
-                        <mainClass>ch.manuel.episimch.Startup</mainClass>
+                        <mainClass>ch.manuel.simplidar.Startup</mainClass>
                     </manifest>
                 </archive>
             </configuration>
