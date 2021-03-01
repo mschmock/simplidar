@@ -29,7 +29,8 @@ public class DataManager {
     private static int sizeCluX;
     private static int sizeCluY;
     private static Cluster[][] mainCluster;
-
+    private static double maxRoughness;
+    
     // rasterAnalyser object
     public static RasterAnalyser analyser;
     
@@ -57,6 +58,10 @@ public class DataManager {
     public static int getClusterSizeY() {
         return sizeCluY;
     }
+    
+    public static double getMaxRoughness() {
+        return maxRoughness;
+    }
 
     // PUBLIC FUNCTIONS
     // create data holder for mainCluster
@@ -79,8 +84,27 @@ public class DataManager {
             // update progressbar
             AnalyseFrame.setProgress(100*i/sizeCluX);
         }
+        // get max Roughness
+        calcMaxRoughness();
         // loading completed: set progressbar back to 0
         AnalyseFrame.setProgress(0);
     }
     
+    // PUBLIC FUNCTIONS
+    // calculate max roughness
+    private static void calcMaxRoughness() {
+        maxRoughness = 0.0;
+        
+        for (int i = 0; i < sizeCluX; i++) {
+            for (int j = 0; j < sizeCluY; j++) {
+                int colIndex = i*size;
+                int rowIndex = j*size;
+                // analyse starts with calling the constructor
+                double tmpRough = mainCluster[i][j].getRoughness();
+                if(tmpRough > maxRoughness ) {
+                    maxRoughness = tmpRough;
+                }
+            }
+        }
+    }
 }

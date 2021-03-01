@@ -4,6 +4,7 @@ package ch.manuel.simplidar.calculation;
 
 import ch.manuel.simplidar.gui.MainFrame;
 import ch.manuel.simplidar.raster.DataManager;
+import ch.manuel.utilities.MyUtilities;
 import java.util.Arrays;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
@@ -22,15 +23,14 @@ public class Calculation {
 
         // test 
         Calculation.createTriangle();
-
-        DataManager.initClusters();
-        Vector3D nClus = DataManager.getElement(0, 0).getNormal();
-        msg += "Norm cluster: " + Arrays.toString(nClus.toArray());
         
+        double arr[] = {2.0, 2.3, 5, 4.8, 1.11};
+        msg += "Std-dev: " + MyUtilities.standardDev(arr) + "\n";
         
         MainFrame.setText(msg);
     }
 
+    // Test
     private static void createTriangle() {
         Point p1 = new Point(2, 7, 0);
         Point p2 = new Point(0, 1, 9);
@@ -45,38 +45,6 @@ public class Calculation {
 
     }
     
-//    public static void testSolver() {
-//        /*
-//        ax + bx + c = z
-//        |x0 y0 1|           |z0|
-//        |x1 y1 1|   |a|     |z1|
-//        |x2 y2 1| X |b| =   |z2|
-//        ...         |c|     ...
-//        |xN yN 1|           |zN|
-//        
-//        A * u = b
-//        */
-//        
-//        double subArray[][] = DataManager.mainRaster.getSubarray(0, 0, 10);
-//        double arrA[][] = { subArray[0] , subArray[1] , subArray[2]};
-//
-//        RealMatrix A = new Array2DRowRealMatrix( new double[][] { { 3, 2, -1 }, { 2, -2, 4 }, { -1, 0.5, -1 } }, false );
-//        RealVector b = new ArrayRealVector( new double[] { 1, -2, 0 }, false );
-//        
-//        RealVector x = solveSystem(A, b);
-//        
-//        System.out.println( x.toString());
-//        
-//    }
-//    
-//     solve linear system
-//    private static RealVector solveSystem(RealMatrix A, RealVector b) {
-//        RealMatrix ATA = A.transpose().multiply(A);
-//        RealVector ATb = A.transpose().operate( b );
-//        
-//        DecompositionSolver solver = new LUDecomposition( ATA ).getSolver();
-//        return solver.solve( ATb );
-//        DecompositionSolver solver = new LUDecomposition( A ).getSolver();
-//        return solver.solve( b );
-//    }
+
+ 
 }

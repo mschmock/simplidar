@@ -64,7 +64,7 @@ public class RasterAnalyser implements Runnable {
                 float incl = 1.0f - DataManager.getElement(i, j).getInclinSunDEG()/ 180.0f;
 
                 // set pixel color in image
-                int col = Color.HSBtoRGB(0.3f, 0.8f, incl);
+                int col = Color.HSBtoRGB(0.6f, 0.1f, incl);
                 AnalyseFrame.getImg().setRGB(i, j, col);
             }
         }
@@ -89,7 +89,7 @@ public class RasterAnalyser implements Runnable {
                 }
 
                 // set pixel color in image
-                int col = Color.HSBtoRGB(0.3f, 0.8f, incl);
+                int col = Color.HSBtoRGB(0.6f, 0.1f, incl);
                 AnalyseFrame.getImg().setRGB(i, j, col);
             }
         }
@@ -115,6 +115,21 @@ public class RasterAnalyser implements Runnable {
     }
     
     private static void showRoughness() {
+        int sizeX = DataManager.getClusterSizeX();
+        int sizeY = DataManager.getClusterSizeY();
+        double maxRough = DataManager.getMaxRoughness();
         
+        for (int i = 0; i < sizeX; i++) {
+            for (int j = 0; j < sizeY; j++) {
+//                float incl;
+//                // inclination from vertical
+//                incl = 1.0f - DataManager.getElement(i, j).getInclinDEG() / 90.0f;
+                float rg = (float) (DataManager.getElement(i, j).getRoughness() / maxRough);
+                // set pixel color in image
+                int c2 = Math.round(255.0f*rg);
+                int col = new Color(0, c2, 0).getRGB();
+                AnalyseFrame.getImg().setRGB(i, j, col);
+            }
+        }
     }
 }

@@ -194,4 +194,27 @@ public class MyUtilities {
             null, txt, title, JOptionPane.YES_NO_OPTION); 
     }
     
+        // standard deviation
+    public static double standardDev(double[] arr) { 
+
+        int n = arr.length; 
+        double sum = 0.0;
+        double mean = 0.0;
+        double stdDev = 0.0;
+        
+        for (int i = 0; i < n; i++) { 
+            sum = sum + arr[i]; 
+        } 
+        
+        mean = sum / (n); 
+  
+        for (int i = 0; i < n; i++) {
+            stdDev = stdDev + Math.pow((arr[i] - mean), 2); 
+            
+        } 
+        
+        double sq = stdDev / n; 
+        return Math.sqrt(sq); 
+    } 
+    
 }
