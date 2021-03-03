@@ -48,20 +48,21 @@ public class RasterAnalyser implements Runnable {
         // repaint img
         AnalyseFrame.repaintImg();
     }
+
     // update dynamically 
     public static void updateImg2(int direction) {
         // update sunbeam direction
         Cluster.setSunbeamDirection(direction);
-        
+
         int sizeX = DataManager.getClusterSizeX();
         int sizeY = DataManager.getClusterSizeY();
         for (int i = 0; i < sizeX; i++) {
             for (int j = 0; j < sizeY; j++) {
                 // recalculate
                 DataManager.getElement(i, j).recalcInclSun();
-                
+
                 // inclination from sunbeam s-w
-                float incl = 1.0f - DataManager.getElement(i, j).getInclinSunDEG()/ 180.0f;
+                float incl = 1.0f - DataManager.getElement(i, j).getInclinSunDEG() / 180.0f;
 
                 // set pixel color in image
                 int col = Color.HSBtoRGB(0.6f, 0.1f, incl);
@@ -81,11 +82,11 @@ public class RasterAnalyser implements Runnable {
             for (int j = 0; j < sizeY; j++) {
                 float incl;
                 // inclination from vertical
-                if(top) {
+                if (top) {
                     incl = 1.0f - DataManager.getElement(i, j).getInclinDEG() / 90.0f;
-                // inclination from sunbeam s-w
+                    // inclination from sunbeam s-w
                 } else {
-                    incl = 1.0f - DataManager.getElement(i, j).getInclinSunDEG()/ 180.0f;
+                    incl = 1.0f - DataManager.getElement(i, j).getInclinSunDEG() / 180.0f;
                 }
 
                 // set pixel color in image
@@ -100,34 +101,33 @@ public class RasterAnalyser implements Runnable {
         int sizeY = DataManager.getClusterSizeY();
         for (int i = 0; i < sizeX; i++) {
             for (int j = 0; j < sizeY; j++) {
-                
-//                float degree = DataManager.getElement(i, j).getOrientEG() / 360.0f;
 
+//                float degree = DataManager.getElement(i, j).getOrientEG() / 360.0f;
                 // set pixel color in image
 //                int col = Color.HSBtoRGB(0.3f, 1.0f, 2f * Math.abs(0.5f - degree));
-                double rad = DataManager.getElement(i, j).getOrientEG() / 180.0 * Math.PI ;
-                int c1 = Math.round( 255.0f * 0.5f * (float)( Math.sin(rad) + 1.0f));
-                int c2 = Math.round( 255.0f * 0.5f * (float)( Math.cos(rad) + 1.0f));
+                double rad = DataManager.getElement(i, j).getOrientEG() / 180.0 * Math.PI;
+                int c1 = Math.round(255.0f * 0.5f * (float) (Math.sin(rad) + 1.0f));
+                int c2 = Math.round(255.0f * 0.5f * (float) (Math.cos(rad) + 1.0f));
                 int col = new Color(255, c1, c2).getRGB();
                 AnalyseFrame.getImg().setRGB(i, j, col);
             }
         }
     }
-    
+
     private static void showRoughness() {
         int sizeX = DataManager.getClusterSizeX();
         int sizeY = DataManager.getClusterSizeY();
         double maxRough = DataManager.getMaxRoughness();
-        
+
         for (int i = 0; i < sizeX; i++) {
             for (int j = 0; j < sizeY; j++) {
-//                float incl;
-//                // inclination from vertical
-//                incl = 1.0f - DataManager.getElement(i, j).getInclinDEG() / 90.0f;
-                float rg = (float) (DataManager.getElement(i, j).getRoughness() / maxRough);
+                float rg;
+
+                // roughness
+//                rg = (float) (Math.log(DataManager.getElement(i, j).getRoughness()) / Math.log(maxRough) );
+                rg = (float) (DataManager.getElement(i, j).getRoughness() / maxRough);
                 // set pixel color in image
-                int c2 = Math.round(255.0f*rg);
-                int col = new Color(0, c2, 0).getRGB();
+                int col = Color.HSBtoRGB(0.0f, 1.0f, rg);
                 AnalyseFrame.getImg().setRGB(i, j, col);
             }
         }

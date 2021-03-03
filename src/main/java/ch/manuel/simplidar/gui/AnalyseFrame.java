@@ -114,7 +114,7 @@ public class AnalyseFrame extends javax.swing.JFrame {
             }
         });
 
-        jLabel1.setText("Beliechtung");
+        jLabel1.setText("Belichtung");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

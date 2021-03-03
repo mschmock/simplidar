@@ -168,7 +168,7 @@ public class MyUtilities {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY );
  
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("ASC Files", "asc"));
-        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("xyz Files", "xyz", "txt"));
+//        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("xyz Files", "xyz", "txt"));
  
         fileChooser.setAcceptAllFileFilterUsed(true);
  

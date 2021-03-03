@@ -1,11 +1,8 @@
 //Autor: Manuel Schmocker
 //Datum: 13.02.2021
-
-
 package ch.manuel.simplidar;
 
 // load lidar-datas from asc-file
-
 import ch.manuel.simplidar.raster.DataManager;
 import ch.manuel.simplidar.gui.MainFrame;
 import ch.manuel.utilities.MyUtilities;
@@ -17,109 +14,92 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
-public class DataLoader implements Runnable{
-    
+public class DataLoader implements Runnable {
+
     // class attributes
     private static final Charset utf8 = StandardCharsets.UTF_8;
     private static File ascFile;
+    private static int nbRowsHeader;
+    // check header & file: -> return true if ok
+    private static boolean[] statusHeader;
     private static boolean fileOK;
-    
+
     @Override
     public void run() {
         // load
-        DataLoader.loadAscFile();
+        DataLoader.selectAscFile();
     }
-    
+
+    // PUBLIC FUNCTIONS
     // set path to asc-file
     public static void selectAscFile() {
         String path = MyUtilities.getOpenFileDialog("Datei öffnen", "D:\\Temp\\LIDAR\\LV95\\data_asc");
-        if( path != null ) {
-            DataLoader.ascFile = new File( path );
+        if (path != null) {
+            // set file path
+            DataLoader.ascFile = new File(path);
+            // reset file status
+            DataLoader.resetHeaderStatus();
             // check file header
-            DataLoader.readFile( true );
+            DataLoader.readHeader();
         }
-        // show header datas
-        MainFrame.showRasterValues();
+        // continue, if header is OK
+        if( getHeaderStatus() && fileOK) {
+            // init Raster
+            boolean isOK = DataManager.mainRaster.initRaster();
+            if( isOK ) {
+                // show header datas
+                MainFrame.showRasterValues();
+                // read file
+                DataLoader.readFile();
+            }else {
+                // show text in gui
+                MainFrame.setText("Datenfeld Raster kann nicht initialisiert werden");
+            }
+        }
     }
     
-    // load file
-    private static void loadAscFile() {
-        // init Raster
-        boolean isOK = DataManager.mainRaster.initRaster();
-        // load file
-        if( isOK ) {
-            DataLoader.readFile( false );
-        }else {
-            // show text in gui
-            MainFrame.setText("Datenfeld kann nicht initialisiert werden");
-        }
+    // PRIVATE FUNCTIONS
+    // reset header status
+    private static void resetHeaderStatus() {
+        DataLoader.statusHeader = new boolean[] {false, false, false, false, false, false};
+        fileOK = false;
+        nbRowsHeader = 0;
+    }
+    // get status header
+    private static boolean getHeaderStatus() {
+        return !Arrays.asList(statusHeader).contains(false);
     }
     
+    // ____READ FILE: 1. ONLY HEADER
     // check header of file
-    private static void readFile( boolean onlyHeader ) {
-               
+    private static void readHeader() {
         // Error message
-        String errMsg = "Alles OK";
+        String errMsg = "Header OK";
         fileOK = true;
-        
+
         // set bufferedReader
         try {
             FileInputStream fis = new FileInputStream(DataLoader.ascFile);
             InputStreamReader isr = new InputStreamReader(fis, utf8);
             BufferedReader br = new BufferedReader(isr);
-            
-             String line = null;
-             int nbLines = 0;
-             
-            // ____1. ONLY HEADER
-            // only header: "onlyHeader == true"
-            if( onlyHeader ) {
 
-                // line by line
-                while( ((line = br.readLine() ) != null ) && ( nbLines < 5 ) ){
+            String line = null;
+            int nbLines = 0;
 
-                    // read & process the line
-                    readHeader( line );
-                    nbLines++;
-                }
-            
-            // ____2. WHOLE FILE    
-            // read the whole file
-            } else {
-                int nbLinesExp = DataManager.mainRaster.getNbRows();
-                
-                // line by line
-                while( (line = br.readLine() ) != null ) {
-                    String[] substr;
-                    substr = line.split(" ");
-                    
-                    if( MyUtilities.isNumeric( substr[0] )) {
-                        // check expected nb of elements
-                        if( substr.length == DataManager.mainRaster.getNbCols() ) {
-                            for( int i = 0; i < substr.length; i++) {
-                                DataManager.mainRaster.setElement(nbLines, i, Double.parseDouble( substr[i] ));
-                            }
-                        }
-                        // show progress
-                        MainFrame.setText("Fortschritt: " + (int)(++nbLines*100.0/nbLinesExp) + " %");
-                    }     
-                }
-                // test
-                //System.out.println("Linien: " +nbLines);
-                    
-                if( nbLines != DataManager.mainRaster.getNbRows() ) {
-                    // error
-                    fileOK = false;
-                    errMsg = "Datei ist nicht korrekt formatiert!";
-                } else {
-                    errMsg += "\nLaden abgeschlossen.";
-                }
-                  
+            // line by line
+            while (((line = br.readLine()) != null) && (nbLines < 5)) {
+
+                // read & process the line
+                readHeaderLine(line);
+                nbLines++;
             }
-            
             br.close();
-                    
+            
+            // set number of rows in header
+            nbRowsHeader = nbLines;
+
         } catch (FileNotFoundException e) {
             fileOK = false;
             errMsg = "Datei nicht gefunden!";
@@ -127,14 +107,70 @@ public class DataLoader implements Runnable{
             fileOK = false;
             errMsg = e.getMessage();
         }
-        
         // show text in gui
         MainFrame.setText(errMsg);
     }
-    
+
+    // ____READ FILE: 2. WHOLE FILE
+    // read file
+    private static void readFile() {
+        // Error message
+        String errMsg = "Alles OK";
+        // set bufferedReader
+        try {
+            FileInputStream fis = new FileInputStream(DataLoader.ascFile);
+            InputStreamReader isr = new InputStreamReader(fis, utf8);
+            BufferedReader br = new BufferedReader(isr);
+            
+            String line = null;
+            int nbLines = 0;
+  
+            // read the whole file
+            int nbLinesExp = DataManager.mainRaster.getNbRows();
+
+            // line by line
+            while ((line = br.readLine()) != null) {
+                String[] substr;
+                substr = line.split(" ");
+
+                if (MyUtilities.isNumeric(substr[0])) {
+                    // check expected nb of elements
+                    if (substr.length == DataManager.mainRaster.getNbCols()) {
+                        for (int i = 0; i < substr.length; i++) {
+                            DataManager.mainRaster.setElement(nbLines, i, Double.parseDouble(substr[i]));
+                        }
+                    }
+                    // show progress
+                    MainFrame.setText("Fortschritt: " + (int) (++nbLines * 100.0 / nbLinesExp) + " %");
+                }
+
+                // test
+                //System.out.println("Linien: " +nbLines);
+            }
+
+        br.close();
+        
+        if (nbLines != DataManager.mainRaster.getNbRows()) {
+            // error
+            fileOK = false;
+            errMsg = "Datei ist nicht korrekt formatiert!";
+        } else {
+            errMsg += "\nLaden abgeschlossen.";
+        }
+
+        } catch (FileNotFoundException e) {
+            errMsg = "Datei nicht gefunden!";
+        } catch (IOException e) {
+            errMsg = e.getMessage();
+        }
+
+        // show text in gui
+        MainFrame.setText(errMsg);
+    }
+
     // read header
-    private static void readHeader(String line) {
-/*
+    private static void readHeaderLine(String line) {
+        /*
 Header Format:
     ncols 8750
     nrows 6000
@@ -142,90 +178,96 @@ Header Format:
     yllcorner 1173000
     cellsize 0.5
     nodata_value 0
-*/
+         */
+
         // check for "ncols"
         // System.out.println( line + ": " + line.contains("ncols") );
-        if( line.contains("ncols") ) {
+        if (line.contains("ncols")) {
             // check value: Numeric int value on 2. position
-            int val = testLnInt( line );
+            int val = testLnInt(line);
             // if value ok -> write to class RasterData
-            if( val != 0 ) {  
-                DataManager.mainRaster.setNbCols( val );
+            if (val != 0) {
+                DataManager.mainRaster.setNbCols(val);
+                statusHeader[0] = true;
             }
         }
         // check for "nrows"
-        if( line.contains("nrows") ) {
+        if (line.contains("nrows")) {
             // check value: Numeric int value on 2. position
-            int val = testLnInt( line );
+            int val = testLnInt(line);
             // if value ok -> write to class RasterData
-            if( val != 0 ) {  
-                DataManager.mainRaster.setNbRows( val );
+            if (val != 0) {
+                DataManager.mainRaster.setNbRows(val);
+                statusHeader[1] = true;
             }
         }
         // check for "xllcorner"
-        if( line.contains("xllcorner") ) {
+        if (line.contains("xllcorner")) {
             // check value: Numeric int value on 2. position
-            int val = testLnInt( line );
+            int val = testLnInt(line);
             // if value ok -> write to class RasterData
-            if( val != 0 ) { 
-                DataManager.mainRaster.setXLLcorner( val );
+            if (val != 0) {
+                DataManager.mainRaster.setXLLcorner(val);
+                statusHeader[2] = true;
             }
         }
         // check for "yllcorner"
-        if( line.contains("yllcorner") ) {
+        if (line.contains("yllcorner")) {
             // check value: Numeric int value on 2. position
-            int val = testLnInt( line );
+            int val = testLnInt(line);
             // if value ok -> write to class RasterData
-            if( val != 0 ) { 
-                DataManager.mainRaster.setYLLcorner( val );
+            if (val != 0) {
+                DataManager.mainRaster.setYLLcorner(val);
+                statusHeader[3] = true;
             }
         }
         // check for "cellsize"
-        if( line.contains("cellsize") ) {
+        if (line.contains("cellsize")) {
             // check value: Numeric int value on 2. position
-            double val = testLnDouble( line );
+            double val = testLnDouble(line);
             // if value ok -> write to class RasterData
-            if( val != 0 ) { 
-                DataManager.mainRaster.setCellsize( val );
-            }        
-        }
-        // check for "nodata_value"
-        if( line.contains("nodata_value") ) {
-            // check value: Numeric int value on 2. position
-            int val = testLnInt( line );
-            // if value ok -> write to class RasterData
-            if( val != 0 ) { 
-                DataManager.mainRaster.setNoDataVal( val );
+            if (val != 0) {
+                DataManager.mainRaster.setCellsize(val);
+                statusHeader[4] = true;
             }
         }
-        
+        // check for "nodata_value"
+        if (line.contains("nodata_value")) {
+            // check value: Numeric int value on 2. position
+            int val = testLnInt(line);
+            // if value ok -> write to class RasterData
+            if (val != 0) {
+                DataManager.mainRaster.setNoDataVal(val);
+                statusHeader[5] = true;
+            }
+        }
     }
-    
+
     // returns null, if input is not ok
-    private static int testLnInt( String str ) {
+    private static int testLnInt(String str) {
         String[] substr;
         substr = str.split(" ");
-        
+
         // 2. Element: int with nb of lines
-        if( !MyUtilities.isInteger( substr[1] ) ) {
+        if (!MyUtilities.isInteger(substr[1])) {
             return 0;
         }
-        
+
         // all OK
-        return Integer.parseInt( substr[1] );
+        return Integer.parseInt(substr[1]);
     }
-    
+
     // returns null, if input is not ok
-    private static double testLnDouble( String str ) {
+    private static double testLnDouble(String str) {
         String[] substr;
         substr = str.split(" ");
-        
+
         // 2. Element: int with nb of lines
-        if( !MyUtilities.isNumeric( substr[1] ) ) {
+        if (!MyUtilities.isNumeric(substr[1])) {
             return 0;
         }
-        
+
         // all OK
-        return Double.parseDouble( substr[1] );
+        return Double.parseDouble(substr[1]);
     }
 }
