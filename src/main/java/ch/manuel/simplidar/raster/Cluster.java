@@ -38,7 +38,7 @@ public class Cluster {
         this.rowIndex = y;
         this.size = size;
         // sunbeam default
-        Cluster.sunbeam = new Vector3D(-1, -1, 1).normalize();
+        Cluster.sunbeam = new Vector3D(-1, -1, 0).normalize();
         // calculate geometric properties
         this.normalOfCluster();
         this.calcInclination();
@@ -72,7 +72,7 @@ public class Cluster {
             return 90.0f - deg;
         }
     }
-    
+
     // roughness
     public double getRoughness() {
         return this.roughness;
@@ -88,7 +88,7 @@ public class Cluster {
         double x = Math.sin(degree * Math.PI / 180.0);
         double y = Math.cos(degree * Math.PI / 180.0);
 
-        Cluster.sunbeam = new Vector3D(x, y, 0.75).normalize();
+        Cluster.sunbeam = new Vector3D(x, y, 0).normalize();
     }
 
     // recalculate sunbeam incl
@@ -177,10 +177,10 @@ public class Cluster {
     private void calcRoughness() {
         double[] delta = new double[size * size];
         int nb = 0;
-        
+
         int xEnd = colIndex + size - 1;
         int yEnd = rowIndex + size - 1;
-        
+
         for (int i = colIndex; i < xEnd; i++) {
             for (int j = rowIndex; j < yEnd; j++) {
 
