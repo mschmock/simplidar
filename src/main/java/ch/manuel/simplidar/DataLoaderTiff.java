@@ -1,6 +1,7 @@
 package ch.manuel.simplidar;
 
 
+import ch.manuel.simplidar.gui.MainFrame;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferFloat;
@@ -12,24 +13,97 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.metadata.IIOMetadataNode;
+import javax.imageio.plugins.tiff.TIFFDirectory;
+import javax.imageio.plugins.tiff.TIFFField;
 import javax.imageio.stream.ImageInputStream;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 public class DataLoaderTiff{
+    
+    // class attributes
     private static String file;
+    private static boolean fileOK;
+    
     
     public static void openTiff() {
         file = getOpenFileDialog("Datei öffnen", "D:\\Temp\\LIDAR\\LV95");
-        readAndDisplayMetadata();
-        //readTiff();
+        
+        //readAndDisplayMetadata();
+        readTiff();
     }
 
+    // PRIVATE FUNCTIONS
     private static void readTiff() {
+        String errMsg = "Alles OK";
+        try {
+            // check header
+            ImageInputStream iis = ImageIO.createImageInputStream(new File(file));
+            Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
+
+            if (readers.hasNext()) {
+                // pick the first available ImageReader
+                ImageReader reader = readers.next();
+                // attach source to the reader
+                reader.setInput(iis, true);
+                
+                // size
+                System.out.println( "nb cols: " + reader.getHeight(0));
+                System.out.println( "Y-Wert: " + reader.getWidth(0));
+                
+                // read metadata of first image
+                IIOMetadata metadata = reader.getImageMetadata(0);
+
+                TIFFDirectory ifd = TIFFDirectory.createFromMetadata​(metadata);
+                TIFFField val = ifd.get​TIFFField(33922); // <TIFFField number="33922" name="ModelTiepointTag">
+/*              <TIFFDouble value="0.0"/>           Pixel x1
+                <TIFFDouble value="0.0"/>           Pixel y1
+                <TIFFDouble value="0.0"/>
+                <TIFFDouble value="2631000.0"/>     --> X Wert für Pixel x1
+                <TIFFDouble value="1172000.0"/>     --> Y-Wert für Pixel y1
+                <TIFFDouble value="0.0"/> */
+
+                System.out.println( "X-Wert: " + val.getAsDouble(3));
+                System.out.println( "Y-Wert: " + val.getAsDouble(4));
+
+                TIFFField val2 = ifd.get​TIFFField(33550); // <TIFFField number="33550" name="ModelPixelScaleTag">
+/*              <TIFFDouble value="0.5"/>       --> Rastergrösse X
+                <TIFFDouble value="0.5"/>       --> Rastergrösse Y
+                <TIFFDouble value="0.0"/>  */
+                
+                System.out.println( "cellsize X: " + val2.getAsDouble(0));
+                System.out.println( "cellsize Y: " + val2.getAsDouble(1));
+                
+                // read tiff
+                DataBuffer dataBuffer = reader.read(0).getRaster().getDataBuffer();
+                
+                DataBufferFloat dataBufferFloat = null;
+                if (dataBuffer instanceof DataBufferFloat) {
+                    dataBufferFloat = (DataBufferFloat)dataBuffer;
+                    
+                    
+                } else {
+                    System.out.println("No DataBufferByte");
+                }
+                
+                float data[] = dataBufferFloat.getData();
+                
+                System.out.println(data[254]);
+                
+            }
+        } catch (IOException e) {
+            fileOK = false;
+            errMsg = e.getMessage();
+                        
+        }
+        // show text in gui
+        MainFrame.setText(errMsg);
+    }
+    
+    
+    private static void readTiffalt() {
         BufferedImage image;
         
         try {
@@ -74,33 +148,9 @@ public class DataLoaderTiff{
         
    
     }
-
-
-    // Dialog zum Speichern der Datei (wird von der Methode "saveFile()" aufgerufen
-    private static String getOpenFileDialog(String title, String defDir) {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle(title);
-        fileChooser.setCurrentDirectory(new File( defDir ));
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY );
- 
-        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Tiff Files", "tif"));
-//        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("xyz Files", "xyz", "txt"));
- 
-        fileChooser.setAcceptAllFileFilterUsed(true);
- 
-        int result = fileChooser.showOpenDialog(null);
- 
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-            return selectedFile.getAbsolutePath();
-        } else {
-            return null;
-        }
-    }
     
     private static void readAndDisplayMetadata() {
         try {
-
             ImageInputStream iis = ImageIO.createImageInputStream(new File(file));
             Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
 
@@ -108,20 +158,18 @@ public class DataLoaderTiff{
 
                 // pick the first available ImageReader
                 ImageReader reader = readers.next();
-                String metaData1 = getNumChannels(reader);
-                System.out.println(metaData1);
                 
                 // attach source to the reader
                 reader.setInput(iis, true);
 
                 // read metadata of first image
                 IIOMetadata metadata = reader.getImageMetadata(0);
-
+                
                 String[] names = metadata.getMetadataFormatNames();
                 int length = names.length;
                 for (int i = 0; i < length; i++) {
                     System.out.println( "Format name: " + names[ i ] );
-                    displayMetadata(metadata.getAsTree(names[i]));
+                    //displayMetadata(metadata.getAsTree(names[i]));
                 }
             }
         }
@@ -129,28 +177,6 @@ public class DataLoaderTiff{
             e.printStackTrace();
         }
     }
-    
-    private static String getNumChannels(ImageReader reader) {
-        try {
-            IIOMetadata imageMetadata = reader.getImageMetadata(0);
-            if (imageMetadata == null) {
-                return "";
-            }
-            IIOMetadataNode metaTree = (IIOMetadataNode) imageMetadata.getAsTree("javax_imageio_1.0");
-            Element numChannelsItem = (Element) metaTree.getElementsByTagName("NumChannels").item(0);
-            if (numChannelsItem == null) {
-                return "";
-            }
-            return numChannelsItem.getAttributes().toString();
-        } catch (IOException | NegativeArraySizeException e) {
-            return "";
-        }
-    } 
-    
-//    IIOMetadata metadata = reader.getImageMetadata(imageIndex);
-//  IIOMetadataNode root = (IIOMetadataNode) metadata.getAsTree(metadata.getNativeMetadataFormatName());
-//  IIOMetadataNode extension = findNode(root, "GraphicControlExtension");
-//  String attribute = (extension != null) ? extension.getAttribute("delayTime") : null;
     
     private static void displayMetadata(Node root) {
         displayMetadata(root, 0);
@@ -195,5 +221,28 @@ public class DataLoaderTiff{
         // print close tag of element
         indent(level);
         System.out.println("</" + node.getNodeName() + ">");
+    }
+    
+    
+    // Dialog zum Speichern der Datei (wird von der Methode "saveFile()" aufgerufen
+    private static String getOpenFileDialog(String title, String defDir) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle(title);
+        fileChooser.setCurrentDirectory(new File( defDir ));
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY );
+ 
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Tiff Files", "tif"));
+//        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("xyz Files", "xyz", "txt"));
+ 
+        fileChooser.setAcceptAllFileFilterUsed(true);
+ 
+        int result = fileChooser.showOpenDialog(null);
+ 
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            return selectedFile.getAbsolutePath();
+        } else {
+            return null;
+        }
     }
 }
