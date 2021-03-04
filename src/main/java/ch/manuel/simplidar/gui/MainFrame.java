@@ -3,6 +3,7 @@
 package ch.manuel.simplidar.gui;
 
 import ch.manuel.simplidar.DataLoader;
+import ch.manuel.simplidar.DataLoaderTiff;
 import ch.manuel.simplidar.calculation.Calculation;
 import ch.manuel.simplidar.raster.DataManager;
 import java.text.DecimalFormat;
@@ -13,6 +14,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     // load and save
     private static DataLoader loadObject;
+    private static DataLoaderTiff loadObjTif;
     // calculation
     private static Thread t1;                   // LOAD file thread
     // frame: "analyseFrame"
@@ -23,6 +25,7 @@ public class MainFrame extends javax.swing.JFrame {
         initComponents();
         // load object
         loadObject = new DataLoader();
+        loadObjTif = new DataLoaderTiff();
     }
 
     // PUBLIC FUNCTIONS
@@ -171,6 +174,11 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu1.add(jMenuItem1);
 
         jMenuItem3.setText("geoTiff laden");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMenuItem3);
 
         jMenuBar1.add(jMenu1);
@@ -307,6 +315,10 @@ public class MainFrame extends javax.swing.JFrame {
         t1 = new Thread(loadObject);
         t1.start();
     }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        DataLoaderTiff.openTiff();
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

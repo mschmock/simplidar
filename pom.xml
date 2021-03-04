@@ -52,11 +52,6 @@
             <artifactId>commons-math3</artifactId>
             <version>3.6.1</version>
         </dependency>
-        <dependency>
-            <groupId>io.oss84.geotools</groupId>
-            <artifactId>gt-geotiff</artifactId>
-            <version>24.2</version>
-        </dependency>
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
