@@ -16,7 +16,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-public class DataLoader implements Runnable {
+public class LoaderASC implements Runnable {
 
     // class attributes
     private static final Charset utf8 = StandardCharsets.UTF_8;
@@ -26,23 +26,26 @@ public class DataLoader implements Runnable {
     private static boolean[] statusHeader;
     private static boolean fileOK;
 
+    // ABSTRACT METHODES
     @Override
     public void run() {
         // load
-        DataLoader.selectAscFile();
+        LoaderASC.openAscFile();
     }
 
     // PUBLIC FUNCTIONS
-    // set path to asc-file
-    public static void selectAscFile() {
+    
+    // PRIVATE FUNCTIONS
+    // procedure to open file
+    public static void openAscFile() {
         String path = MyUtilities.getOpenFileDialog("Datei öffnen", "D:\\Temp\\LIDAR\\LV95\\data_asc");
         if (path != null) {
             // set file path
-            DataLoader.ascFile = new File(path);
+            LoaderASC.ascFile = new File(path);
             // reset file status
-            DataLoader.resetHeaderStatus();
+            LoaderASC.resetHeaderStatus();
             // check file header
-            DataLoader.readHeader();
+            LoaderASC.readHeader();
         }
         // continue, if header is OK
         if( getHeaderStatus() && fileOK) {
@@ -52,21 +55,21 @@ public class DataLoader implements Runnable {
                 // show header datas
                 MainFrame.showRasterValues();
                 // read file
-                DataLoader.readFile();
-            }else {
+                LoaderASC.readFile();
+            } else {
                 // show text in gui
                 MainFrame.setText("Datenfeld Raster kann nicht initialisiert werden");
             }
         }
     }
     
-    // PRIVATE FUNCTIONS
     // reset header status
     private static void resetHeaderStatus() {
-        DataLoader.statusHeader = new boolean[] {false, false, false, false, false, false};
+        LoaderASC.statusHeader = new boolean[] {false, false, false, false, false, false};
         fileOK = false;
         nbRowsHeader = 0;
     }
+    
     // get status header
     private static boolean getHeaderStatus() {
         return !Arrays.asList(statusHeader).contains(false);
@@ -75,13 +78,13 @@ public class DataLoader implements Runnable {
     // ____READ FILE: 1. ONLY HEADER
     // check header of file
     private static void readHeader() {
-        // Error message
-        String errMsg = "Header OK";
+        // status message
+        String statusMsg = "Header OK";
         fileOK = true;
 
         // set bufferedReader
         try {
-            FileInputStream fis = new FileInputStream(DataLoader.ascFile);
+            FileInputStream fis = new FileInputStream(LoaderASC.ascFile);
             InputStreamReader isr = new InputStreamReader(fis, utf8);
             BufferedReader br = new BufferedReader(isr);
 
@@ -102,23 +105,23 @@ public class DataLoader implements Runnable {
 
         } catch (FileNotFoundException e) {
             fileOK = false;
-            errMsg = "Datei nicht gefunden!";
+            statusMsg = "Datei nicht gefunden!";
         } catch (IOException e) {
             fileOK = false;
-            errMsg = e.getMessage();
+            statusMsg = e.getMessage();
         }
         // show text in gui
-        MainFrame.setText(errMsg);
+        MainFrame.setText(statusMsg);
     }
 
     // ____READ FILE: 2. WHOLE FILE
     // read file
     private static void readFile() {
         // Error message
-        String errMsg = "Alles OK";
+        String statusMsg = "Alles OK";
         // set bufferedReader
         try {
-            FileInputStream fis = new FileInputStream(DataLoader.ascFile);
+            FileInputStream fis = new FileInputStream(LoaderASC.ascFile);
             InputStreamReader isr = new InputStreamReader(fis, utf8);
             BufferedReader br = new BufferedReader(isr);
             
@@ -132,7 +135,8 @@ public class DataLoader implements Runnable {
             while ((line = br.readLine()) != null) {
                 String[] substr;
                 substr = line.split(" ");
-
+                
+                //skip lines of header: non numeric value in pos '0'
                 if (MyUtilities.isNumeric(substr[0])) {
                     // check expected nb of elements
                     if (substr.length == DataManager.mainRaster.getNbCols()) {
@@ -143,32 +147,30 @@ public class DataLoader implements Runnable {
                     // show progress
                     MainFrame.setText("Fortschritt: " + (int) (++nbLines * 100.0 / nbLinesExp) + " %");
                 }
-
-                // test
-                //System.out.println("Linien: " +nbLines);
+            }
+            
+            statusMsg += "\nLinien geladen: " + nbLines;
+            br.close();
+        
+            if (nbLines != DataManager.mainRaster.getNbRows()) {
+                // error
+                fileOK = false;
+                statusMsg = "Datei ist nicht korrekt formatiert!";
+            } else {
+                statusMsg += "\nLaden abgeschlossen.";
             }
 
-        br.close();
-        
-        if (nbLines != DataManager.mainRaster.getNbRows()) {
-            // error
-            fileOK = false;
-            errMsg = "Datei ist nicht korrekt formatiert!";
-        } else {
-            errMsg += "\nLaden abgeschlossen.";
-        }
-
         } catch (FileNotFoundException e) {
-            errMsg = "Datei nicht gefunden!";
+            statusMsg = "Datei nicht gefunden!";
         } catch (IOException e) {
-            errMsg = e.getMessage();
+            statusMsg = e.getMessage();
         }
 
         // show text in gui
-        MainFrame.setText(errMsg);
+        MainFrame.setText(statusMsg);
     }
 
-    // read header
+    // read & check line of header
     private static void readHeaderLine(String line) {
         /*
 Header Format:
