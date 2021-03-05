@@ -2,8 +2,8 @@
 //Datum: 13.02.2021
 package ch.manuel.simplidar.gui;
 
-import ch.manuel.simplidar.DataLoader;
-import ch.manuel.simplidar.DataLoaderTiff;
+import ch.manuel.simplidar.LoaderASC;
+import ch.manuel.simplidar.LoaderTiff;
 import ch.manuel.simplidar.calculation.Calculation;
 import ch.manuel.simplidar.raster.DataManager;
 import java.text.DecimalFormat;
@@ -13,8 +13,8 @@ import javax.swing.SpinnerNumberModel;
 public class MainFrame extends javax.swing.JFrame {
 
     // load and save
-    private static DataLoader loadObject;
-    private static DataLoaderTiff loadObjTif;
+    private static LoaderASC loadObjAsc;
+    private static LoaderTiff loadObjTif;
     // calculation
     private static Thread t1;                   // LOAD file thread
     // frame: "analyseFrame"
@@ -24,8 +24,8 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         // load object
-        loadObject = new DataLoader();
-        loadObjTif = new DataLoaderTiff();
+        loadObjAsc = new LoaderASC();
+        loadObjTif = new LoaderTiff();
     }
 
     // PUBLIC FUNCTIONS
@@ -292,7 +292,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // Load file
-        t1 = new Thread(loadObject);
+        t1 = new Thread(loadObjAsc);
         t1.start();
 
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -311,13 +311,15 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        // Load file
-        t1 = new Thread(loadObject);
+        // Load file: Asc
+        t1 = new Thread(loadObjAsc);
         t1.start();
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-        DataLoaderTiff.openTiff();
+        // Load file: Tiff
+        t1 = new Thread(loadObjTif);
+        t1.start();
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
 
