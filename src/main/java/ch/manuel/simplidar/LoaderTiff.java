@@ -2,23 +2,19 @@ package ch.manuel.simplidar;
 
 import ch.manuel.simplidar.gui.MainFrame;
 import ch.manuel.simplidar.raster.DataManager;
-import java.awt.image.BufferedImage;
+import ch.manuel.utilities.MyUtilities;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferFloat;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.plugins.tiff.TIFFDirectory;
 import javax.imageio.plugins.tiff.TIFFField;
 import javax.imageio.stream.ImageInputStream;
-import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -43,7 +39,9 @@ public class LoaderTiff implements Runnable {
     // PRIVATE FUNCTIONS
     // procedure to open file
     private static void openTiffFile() {
-        String path = getOpenFileDialog("Datei öffnen", "D:\\Temp\\LIDAR\\LV95");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("geoTiff-Datei", "tif");
+        String defPath = Startup.getDefaultPath();
+        String path = MyUtilities.getOpenFileDialog("Datei öffnen", defPath, filter);
         if (path != null) {
             // set file path
             LoaderTiff.tiffFile = new File(path);
@@ -110,19 +108,25 @@ public class LoaderTiff implements Runnable {
                 <TIFFDouble value="2631000.0"/>     --> X Wert für Pixel x1
                 <TIFFDouble value="1172000.0"/>     --> Y-Wert für Pixel y1
                 <TIFFDouble value="0.0"/> */
-                DataManager.mainRaster.setXLLcorner((int) val.getAsDouble(3));
-                DataManager.mainRaster.setYLLcorner((int) val.getAsDouble(4));
+                double xMin = val.getAsDouble(3);
+                double yMax = val.getAsDouble(4);
 
                 // cellsize
                 TIFFField val2 = ifd.get​TIFFField(33550); // <TIFFField number="33550" name="ModelPixelScaleTag">
 /*              <TIFFDouble value="0.5"/>       --> Rastergrösse X
                 <TIFFDouble value="0.5"/>       --> Rastergrösse Y
                 <TIFFDouble value="0.0"/>  */
-                DataManager.mainRaster.setCellsize(val2.getAsDouble(0));
+                double cellsize = val2.getAsDouble(0);
+                DataManager.mainRaster.setCellsize(cellsize);
                 if (val2.getAsDouble(0) != val2.getAsDouble(1)) {
                     statusMsg += "\nWarnung: Zellgrösse X und Y sind unterschiedlich";
                 }
-
+                
+                // set Bounds
+                double xMax = xMin + pixelH * cellsize;
+                double yMin = yMax - pixelW * cellsize;
+                DataManager.mainRaster.setBounds(xMin, xMax, yMin, yMax);
+                
                 // number of bands
                 int nbBands = reader.read(0).getRaster().getNumBands();
                 if (nbBands != 1) {
@@ -268,27 +272,4 @@ public class LoaderTiff implements Runnable {
         indent(level);
         System.out.println("</" + node.getNodeName() + ">");
     }
-
-    // Dialog zum Speichern der Datei (wird von der Methode "saveFile()" aufgerufen
-    private static String getOpenFileDialog(String title, String defDir) {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle(title);
-        fileChooser.setCurrentDirectory(new File(defDir));
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
-        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Tiff Files", "tif"));
-//        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("xyz Files", "xyz", "txt"));
-
-        fileChooser.setAcceptAllFileFilterUsed(true);
-
-        int result = fileChooser.showOpenDialog(null);
-
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-            return selectedFile.getAbsolutePath();
-        } else {
-            return null;
-        }
-    }
-
 }

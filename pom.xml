@@ -9,7 +9,7 @@
         <build>
         <resources>
             <resource>
-                <directory>src/main/resources/</directory>
+                <directory>src/main/resources</directory>
             </resource>
         </resources>
         <plugins>
@@ -51,6 +51,12 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
             <version>3.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
     <properties>

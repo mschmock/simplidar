@@ -3,7 +3,12 @@
 
 package ch.manuel.utilities;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.logging.Level;
@@ -11,7 +16,6 @@ import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 //Klasse mit verschiedenen Hilfsmittel
@@ -144,31 +148,15 @@ public class MyUtilities {
             //Main.myFrame.updateLaF();
         }
     }
-  
     
     // Dialog zum Speichern der Datei (wird von der Methode "saveFile()" aufgerufen
-    public static String getSaveFileDialog(java.awt.Frame f, String title, String defDir, String fileType) {
-        java.awt.FileDialog fd = new java.awt.FileDialog(f, title, java.awt.FileDialog.SAVE);
-        fd.setFile(fileType);
-        fd.setDirectory(defDir);
-        fd.setLocation(50, 50);
-        fd.setVisible(true);
-        if ( fd.getDirectory() == null) {
-            return null;
-        } else {
-            return fd.getDirectory() + fd.getFile();
-        }
-    }
-    
-    // Dialog zum Speichern der Datei (wird von der Methode "saveFile()" aufgerufen
-    public static String getOpenFileDialog(String title, String defDir) {
+    public static String getOpenFileDialog(String title, String defDir, FileNameExtensionFilter filter) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle(title);
         fileChooser.setCurrentDirectory(new File( defDir ));
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY );
  
-        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("ASC Files", "asc"));
-//        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("xyz Files", "xyz", "txt"));
+        fileChooser.addChoosableFileFilter(filter);
  
         fileChooser.setAcceptAllFileFilterUsed(true);
  
@@ -194,7 +182,7 @@ public class MyUtilities {
             null, txt, title, JOptionPane.YES_NO_OPTION); 
     }
     
-        // standard deviation
+    // standard deviation
     public static double standardDev(double[] arr) { 
 
         int n = arr.length; 
@@ -215,6 +203,27 @@ public class MyUtilities {
         
         double sq = stdDev / n; 
         return Math.sqrt(sq); 
-    } 
+    }
     
+    // file path from resource
+    public static String fileFromRes() {
+            String fileName = "/data/stdPath.txt";
+            String line = "";
+            
+        try {
+            InputStream stream = MyUtilities.class.getResourceAsStream(fileName);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+            
+            // read line (only 1 line expected)
+            line = reader.readLine();
+            
+//            while ((line = reader.readLine()) != null) {
+//                line += line;
+//            }
+            reader.close();
+        } catch (IOException ex) {
+            Logger.getLogger(MyUtilities.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return line;
+    }
 }

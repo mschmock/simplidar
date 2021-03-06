@@ -9,10 +9,13 @@ public class Raster {
     // class attributes
     private int nbCols;
     private int nbRows;
-    private int xCorner;        // lower left corner: x-value
-    private int yCorner;        // lower left corner: y-value
     private double cellsize;
     private int nodata_val;
+    // bounds
+    private double xMax;
+    private double yMax;
+    private double xMin;
+    private double yMin;
 
     // raster data
     private double[][] raster;
@@ -40,12 +43,12 @@ public class Raster {
 
     // coordinate X für column-index
     public double getCoord_X(int column) {
-        return 1.0 * xCorner + cellsize * column;
+        return 1.0 * xMin + cellsize * column;
     }
 
     // coordinate Y für column-index
     public double getCoord_Y(int row) {
-        return 1.0 * yCorner + cellsize * (nbRows - row - 1);
+        return 1.0 * yMin + cellsize * (nbRows - row - 1);
     }
 
     // get coordinates for triange-points
@@ -57,6 +60,12 @@ public class Raster {
         return new Point(x, y, z);
     }
 
+    // calculate bounds xMax / yMax from xMin / yMin and cellsize
+    public void calcBounds() {
+        xMax = xMin + cellsize * nbCols;
+        yMax = yMin + cellsize * nbRows;
+    }
+
     // SETTER
     public void setNbCols(int number) {
         this.nbCols = number;
@@ -66,20 +75,27 @@ public class Raster {
         this.nbRows = number;
     }
 
-    public void setXLLcorner(int number) {
-        this.xCorner = number;
-    }
-
-    public void setYLLcorner(int number) {
-        this.yCorner = number;
-    }
-
     public void setCellsize(double size) {
         this.cellsize = size;
     }
 
     public void setNoDataVal(int val) {
         this.nodata_val = val;
+    }
+
+    public void setBounds(double xMin, double xMax, double yMin, double yMax) {
+        this.xMin = xMin;
+        this.xMax = xMax;
+        this.yMin = yMin;
+        this.yMax = yMax;
+    }
+
+    public void setXLLcorner(double xllcorner) {
+        this.xMin = xllcorner;
+    }
+
+    public void setYLLcorner(double yllcorner) {
+        this.yMin = yllcorner;
     }
 
     // GETTER
@@ -91,12 +107,20 @@ public class Raster {
         return this.nbRows;
     }
 
-    public int getXLLcorner() {
-        return this.xCorner;
+    public double getXmin() {
+        return this.xMin;
     }
 
-    public int getYLLcorner() {
-        return this.yCorner;
+    public double getXmax() {
+        return this.xMax;
+    }
+
+    public double getYmin() {
+        return this.yMin;
+    }
+
+    public double getYmax() {
+        return this.yMax;
     }
 
     public double getCellsize() {

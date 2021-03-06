@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class LoaderASC implements Runnable {
 
@@ -38,7 +39,9 @@ public class LoaderASC implements Runnable {
     // PRIVATE FUNCTIONS
     // procedure to open file
     public static void openAscFile() {
-        String path = MyUtilities.getOpenFileDialog("Datei öffnen", "D:\\Temp\\LIDAR\\LV95\\data_asc");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC Files", "asc");
+        String defPath = Startup.getDefaultPath();
+        String path = MyUtilities.getOpenFileDialog("Datei öffnen", defPath, filter);
         if (path != null) {
             // set file path
             LoaderASC.ascFile = new File(path);
@@ -110,6 +113,10 @@ public class LoaderASC implements Runnable {
             fileOK = false;
             statusMsg = e.getMessage();
         }
+        // calculate bounds from  xllcorner / yllcorner 
+        if( fileOK ) {
+            DataManager.mainRaster.calcBounds();
+        }
         // show text in gui
         MainFrame.setText(statusMsg);
     }
@@ -173,13 +180,13 @@ public class LoaderASC implements Runnable {
     // read & check line of header
     private static void readHeaderLine(String line) {
         /*
-Header Format:
-    ncols 8750
-    nrows 6000
-    xllcorner 2628750
-    yllcorner 1173000
-    cellsize 0.5
-    nodata_value 0
+        Header Format:
+                ncols 8750
+                nrows 6000
+                xllcorner 2628750
+                yllcorner 1173000
+                cellsize 0.5
+                nodata_value 0
          */
 
         // check for "ncols"
