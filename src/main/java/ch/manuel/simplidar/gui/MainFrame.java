@@ -85,10 +85,11 @@ public class MainFrame extends javax.swing.JFrame {
         jTextArea2 = new javax.swing.JTextArea();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem11 = new javax.swing.JMenuItem();
+        jMenuItem12 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem21 = new javax.swing.JMenuItem();
+        jMenuItem22 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("simpLIDAR");
@@ -142,33 +143,36 @@ public class MainFrame extends javax.swing.JFrame {
 
         jMenu1.setText("Datei");
 
-        jMenuItem1.setText("ASC-File laden");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem11.setText("ASC-File laden");
+        jMenuItem11.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                jMenuItem11ActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem1);
+        jMenu1.add(jMenuItem11);
 
-        jMenuItem3.setText("geoTiff laden");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem12.setText("geoTiff laden");
+        jMenuItem12.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem3ActionPerformed(evt);
+                jMenuItem12ActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem3);
+        jMenu1.add(jMenuItem12);
 
         jMenuBar1.add(jMenu1);
 
-        jMenu2.setText("Analyse");
+        jMenu2.setText("Werkzeuge");
 
-        jMenuItem2.setText("Daten Viewer");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem21.setText("Rasteranalyse");
+        jMenuItem21.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+                jMenuItem21ActionPerformed(evt);
             }
         });
-        jMenu2.add(jMenuItem2);
+        jMenu2.add(jMenuItem21);
+
+        jMenuItem22.setText("Raster kombinieren");
+        jMenu2.add(jMenuItem22);
 
         jMenuBar1.add(jMenu2);
 
@@ -256,22 +260,22 @@ public class MainFrame extends javax.swing.JFrame {
         Calculation.testCalc(x, y);
     }//GEN-LAST:event_jButton3ActionPerformed
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+    private void jMenuItem21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem21ActionPerformed
         // show AnalyseFrame
         MainFrame.openAnalyseFrame();
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+    }//GEN-LAST:event_jMenuItem21ActionPerformed
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
         // Load file: Asc
         t1 = new Thread(loadObjAsc);
         t1.start();
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_jMenuItem11ActionPerformed
 
-    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+    private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
         // Load file: Tiff
         t1 = new Thread(loadObjTif);
         t1.start();
-    }//GEN-LAST:event_jMenuItem3ActionPerformed
+    }//GEN-LAST:event_jMenuItem12ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -285,9 +289,10 @@ public class MainFrame extends javax.swing.JFrame {
     private static javax.swing.JMenu jMenu1;
     private static javax.swing.JMenu jMenu2;
     private static javax.swing.JMenuBar jMenuBar1;
-    private static javax.swing.JMenuItem jMenuItem1;
-    private static javax.swing.JMenuItem jMenuItem2;
-    private static javax.swing.JMenuItem jMenuItem3;
+    private static javax.swing.JMenuItem jMenuItem11;
+    private static javax.swing.JMenuItem jMenuItem12;
+    private static javax.swing.JMenuItem jMenuItem21;
+    private static javax.swing.JMenuItem jMenuItem22;
     private static javax.swing.JScrollPane jScrollPane1;
     private static javax.swing.JScrollPane jScrollPane2;
     private static javax.swing.JSpinner jSpinner21;

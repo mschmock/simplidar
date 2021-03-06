@@ -132,7 +132,7 @@ public class LoaderTiff implements Runnable {
                 if (nbBands != 1) {
                     fileOK = false;
                     statusMsg = "Datei darf nur 1 Band enthalten.";
-                    statusMsg = "\nAnzahl B\u00e4nder:" + nbBands;
+                    statusMsg += "\nAnzahl B\u00e4nder:" + nbBands;
                 }
 
             } else {
@@ -170,25 +170,25 @@ public class LoaderTiff implements Runnable {
                 DataBufferFloat dataBufferFloat = null;
                 if (dataBuffer instanceof DataBufferFloat) {
                     dataBufferFloat = (DataBufferFloat)dataBuffer;
+                    
+                    // copy data to array
+                    float data[] = dataBufferFloat.getData();
+
+                    for (int y = 0; y < pixelH; y++) {
+                        for (int x = 0; x < pixelW; x++) {
+                            DataManager.mainRaster.setElement(y, x, data[x+y*pixelW]);
+                        }
+                        // show progress
+                        MainFrame.setText("Fortschritt: " + (int) (y * 100.0 / pixelH) + " %");
+                    }
+                    
+                    // status
+                    statusMsg += "\nLaden abgeschlossen.";
+                    
                 } else {
                     fileOK = false;
                     statusMsg = "Datentyp muss Float sein!";
-                    return;
                 }
-                
-                // copy data to array
-                float data[] = dataBufferFloat.getData();
-                
-                for (int y = 0; y < pixelH; y++) {
-                    for (int x = 0; x < pixelW; x++) {
-                        DataManager.mainRaster.setElement(y, x, data[x+y*pixelW]);
-                    }
-                    // show progress
-                    MainFrame.setText("Fortschritt: " + (int) (y * 100.0 / pixelH) + " %");
-                }
-
-                // status
-                statusMsg += "\nLaden abgeschlossen.";
             }
         } catch (IOException e) {
             fileOK = false;
