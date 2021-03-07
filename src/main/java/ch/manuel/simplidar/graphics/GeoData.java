@@ -3,16 +3,17 @@
 
 package ch.manuel.simplidar.graphics;
 
-//Klasse zum Verwalten der Geodaten (Gemeindegrenzen, Einwohner, Altersklassen)
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+//Klasse zum Verwalten der Geodaten (Gemeindegrenzen, Einwohner, Altersklassen)
 public class GeoData {
-    // Class attributes
+    
+// Class attributes
     private static int nbMunicip;                       // Anzahl Gemeinden
     private static int minX;                            // min X-Koordinate   
     private static int minY;                            // min Y-Koordinate
@@ -21,7 +22,6 @@ public class GeoData {
     
     private static List<Municipality> listMunicip;              // Liste mit Gemeinden: Klasse Municipality.java
     private static Map<Integer,Municipality> mapID;             // map with id (BFS-ID in Daten)
-    private static int[][] distances;                           // Distanzen zwischen den Gemeinden
     
     // Constructor
     public GeoData() {
@@ -59,40 +59,16 @@ public class GeoData {
                 maxY = ( maxY > listMunicip.get(i).getMaxN() ) ? maxY : listMunicip.get(i).getMaxN();
             }
         }
-    }
+    }  
     
-    // calculate matrix with distance beween municipalities
-    public void calculateDistances() {
-        distances = new int[nbMunicip][nbMunicip];
-        
-        if( nbMunicip > 1 ) {
-            for (int i = 0; i < nbMunicip; i++) {
-                for (int j = 0; j < nbMunicip; j++) {
-                    if(i == j) {
-                        distances[i][j] = 0;
-                    } else {
-                        int deltaX = listMunicip.get(i).getCenterE() - listMunicip.get(j).getCenterE();
-                        int deltaY = listMunicip.get(i).getCenterN() - listMunicip.get(j).getCenterN();
-                        
-                        double dist = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2))/1000;    // Distanz in km
-                        distances[i][j] = (int) dist;
-                        distances[j][i] = (int) dist;
-                    }
-                }
-            }
-        }
-    }
-   
-    
-    // setter
+    // SETTER
     // map id with municipality
     public void setID(int id, Municipality obj) {
         mapID.put( id, obj);
         obj.setID(id);
     }
     
-    
-    // getter
+    // GETTER
     public static Municipality getLastElement() {
         return GeoData.listMunicip.get(nbMunicip - 1);
     }
@@ -120,18 +96,13 @@ public class GeoData {
     public int getHeight() {
         return (GeoData.maxY - GeoData.minY);
     }
-    public int getDistKM(int index1, int index2) {
-        return distances[index1][index2];
-    }
     
-    // test
+    // TEST
     public void testprint() {
         for (int i = 0; i < nbMunicip; i++) {
             Municipality tmpMunicip = listMunicip.get(i);
             System.out.println( "Name: " + tmpMunicip.getName() + " - ID: " + tmpMunicip.getID() );
             System.out.println( "Zentrum: " + tmpMunicip.getCenterE() + "E / " + listMunicip.get(i).getCenterN() + "N");
-            System.out.println( "Einwohner: " + tmpMunicip.getPopulation() );
-            System.out.println("Distanz zu Element 0: " + this.getDistKM(i, 0));
             System.out.println( "___" );
         }
     }

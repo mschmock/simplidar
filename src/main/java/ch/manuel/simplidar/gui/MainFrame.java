@@ -18,7 +18,8 @@ public class MainFrame extends javax.swing.JFrame {
     // calculation
     private static Thread t1;                   // LOAD file thread
     // frame: "analyseFrame"
-    private static AnalyseFrame aFrame;
+    private static AnalyseFrame aFrame;         // analyseFrame
+    private static RasterFrame rFrame;          // rasterFrame (merge + cut raster)
 
     // CONSTRUCTOR
     public MainFrame() {
@@ -172,6 +173,11 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu2.add(jMenuItem21);
 
         jMenuItem22.setText("Raster kombinieren");
+        jMenuItem22.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem22ActionPerformed(evt);
+            }
+        });
         jMenu2.add(jMenuItem22);
 
         jMenuBar1.add(jMenu2);
@@ -277,6 +283,11 @@ public class MainFrame extends javax.swing.JFrame {
         t1.start();
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
+    private void jMenuItem22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem22ActionPerformed
+        // show RasterFrame
+        MainFrame.openRasterFrame();
+    }//GEN-LAST:event_jMenuItem22ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private static javax.swing.JButton jButton1;
@@ -301,14 +312,27 @@ public class MainFrame extends javax.swing.JFrame {
     private static javax.swing.JTextArea jTextArea2;
     // End of variables declaration//GEN-END:variables
 
-    // PUBLIC FUNCTIONS
+    // PRIVATE FUNCTIONS
     // open frame "AnalyseFrame"
     private static void openAnalyseFrame() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 aFrame = new AnalyseFrame();
                 aFrame.setVisible(true);
+            }
+        });
+    }
+    
+    // open frame "AnalyseFrame"
+    private static void openRasterFrame() {
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                rFrame = new RasterFrame();
+                rFrame.setVisible(true);
             }
         });
     }

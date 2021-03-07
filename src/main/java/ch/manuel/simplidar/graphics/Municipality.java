@@ -3,12 +3,11 @@
 
 package ch.manuel.simplidar.graphics;
 
-// Klasse zum Verwalten der Daten pro Gemeinde
-
 import ch.manuel.utilities.MyUtilities;
 import java.util.ArrayList;
 import java.util.List;
 
+// Klasse zum Verwalten der Daten pro Gemeinde
 public class Municipality {
     // Class attributes
     private String name;                        // Name Gemeinde
@@ -20,26 +19,11 @@ public class Municipality {
     private int maxN;                           // Umgrenzung: max Koordinate LV 95 N
     private int minE;                           // Umgrenzung: min Koordinate LV 95 E
     private int maxE;                           // Umgrenzung: max Koordinate LV 95 E
-    private int population;                     // Einwohner
-    private int haushalte;                      // Anz. Haushalte
     // Gemeindegrenzen
     private List<int[]> polyX;                  // Polygone Gemeindegrenze, X-Werte
     private List<int[]> polyY;                  // Polygone Gemeindegrenze, Y-Werte
-    // Liste mit Personen
-    private int[] listIndexPers;                // Index in Class population
-    // Daten aus Infektion
-    private int nbInfections;                   // Anzahl Infektionen in der Gemeinde
-    private float nbInfectionsRel;              // Anzahl Infektionen in der Gemeinde pro 1000 Einwohner
-    private int nbDeath;                        // Anzahl Tote in der Gemeinde
-    private int nbImmune;                       // Anzahl Immunisierte in der Gemeinde
-    private float K0;                           // Basisreproduktionszahl K0 in der Gemeinde
-    private static int maxInfections;           // max Infektionen gesamt -> static
-    private static float maxInfectionsRel;        // max Infektionen pro 1000 Einwohnler -> static
-    private static int maxDeath;                // max Tote gesamt -> static
-    private static int maxImmune;               // max Immunisierte gesamt -> static
-    private static float maxK0;                 // max Wert für Baissrep. K0 -> static
     
-    // Constructor
+    // CONSTRUCTOR
     public Municipality(String name) {
         this.name = name;
         
@@ -48,10 +32,7 @@ public class Municipality {
         polyY = new ArrayList<>();
     }
     
-    // Methodes: setter
-    public void setListPers(int[] arr) {
-        this.listIndexPers = arr;
-    }
+    // SETTER
     public void setIndex(int index) {
         this.index = index;
     }
@@ -79,43 +60,7 @@ public class Municipality {
     public void setMaxE(int maxE) {
         this.maxE = maxE;
     }
-    public void setPopulation(int population) {
-        this.population = population;
-    }
-    public void setHouseholds(int nb ) {
-        this.haushalte = nb;
-    }
-    public void setNbInfections( int nb ) {
-        this.nbInfections = nb;
-    }
-    public void setNbInfectPerInhab( int nb ) {
-        this.nbInfectionsRel = (float) nb / this.population * 1000f;
-    }
-    public void setNbDeath( int nb ) {
-        this.nbDeath = nb;
-    }
-    public void setNbImmune( int nbImmune ) {
-        this.nbImmune = nbImmune;
-    }
-    public void setR0( float K0 ) {
-        this.K0 = K0;
-    }
-    public static void setMaxInfections( int nb ) {
-        Municipality.maxInfections = nb;
-    }     
-    public static void setMaxInfectPerInhab( float val ) {
-        Municipality.maxInfectionsRel = val;
-    }     
-    public static void setMaxDeath( int nb ) {
-        Municipality.maxDeath = nb;
-    }
-    public static void setMaxImmune( int nb ) {
-        Municipality.maxImmune = nb;
-    }
-    public static void setMaxR0( float val ) {
-        Municipality.maxK0 = val;
-    }
-    
+
     public boolean setPolygon(String polygon) {
         
         boolean isValid = true;
@@ -142,7 +87,43 @@ public class Municipality {
         
         return isValid;
     }
+     
+    // GETTER
+    public int getIndex() {
+        return this.index;
+    }
+    public String getName() {
+        return this.name;
+    }
+    public int getID() {
+        return this.id;
+    }
+    public int getCenterN() {
+        return this.centerN;
+    }
+    public int getCenterE() {
+        return this.centerE;
+    }
+    public int getMinN() {
+        return this.minN;
+    }
+    public int getMaxN() {
+        return this.maxN;
+    }
+    public int getMinE() {
+        return this.minE;
+    }
+    public int getMaxE() {
+        return this.maxE;
+    }
+    public List<int[]> getPolyX() {
+        return this.polyX;
+    }
+    public List<int[]> getPolyY() {
+        return this.polyY;
+    }
     
+    // PRIVATE FUNCTIONS
     private boolean stringToPoly(String polygon) {
             
         boolean isValid = true;
@@ -154,8 +135,8 @@ public class Municipality {
         }
         
         // temp arry with x and y values
-        List<Integer> xVals = new ArrayList<Integer>();
-        List<Integer> yVals = new ArrayList<Integer>();
+        List<Integer> xVals = new ArrayList<>();
+        List<Integer> yVals = new ArrayList<>();
 
         // Split ","
         if( polygon.contains(",") ) {
@@ -184,12 +165,10 @@ public class Municipality {
                     } else {
                         // not valid
                         return false;
-
                     }
                 } else {
                     // not valid
                     return false;
-
                 }
             }
         } else {
@@ -208,80 +187,6 @@ public class Municipality {
         }
 
         return isValid;
-    }
-    
-    // Methodes: getter
-    public int[] getArrListPers() {
-        return this.listIndexPers;
-    }
-    public int getIndex() {
-        return this.index;
-    }
-    public String getName() {
-        return this.name;
-    }
-    public int getID() {
-        return this.id;
-    }
-    public int getCenterN() {
-        return this.centerN;
-    }
-    public int getCenterE() {
-        return this.centerE;
-    }
-    public int getMinN() {
-        return this.minN;
-    }
-    public int getMaxN() {
-        return this.maxN;
-    }
-    public int getMinE() {
-        return this.minE;
-    }
-    public int getMaxE() {
-        return this.maxE;
-    }
-    public int getPopulation() {
-        return this.population;
-    }
-    public float nbPerHousehold() {
-        return this.population / this.haushalte;
-    }
-    public List<int[]> getPolyX() {
-        return this.polyX;
-    }
-    public List<int[]> getPolyY() {
-        return this.polyY;
-    }
-    public int getNbInfections() {
-        return this.nbInfections;
-    }
-    public float getNbInfectPerInhab() {
-        return this.nbInfectionsRel;
-    }
-    public int getNbDeath() {
-        return this.nbDeath;
-    }
-    public int getNbImmune() {
-        return this.nbImmune;
-    }
-    public float getK0() {
-        return this.K0;
-    }
-    public static int getMaxInfections() {
-        return Municipality.maxInfections;
-    }     
-    public static float getMaxInfectPerInhab() {
-        return Municipality.maxInfectionsRel;
-    }     
-    public static int getMaxDeath() {
-        return Municipality.maxDeath;
-    }
-    public static int getMaxImmune() {
-        return Municipality.maxImmune;
-    }
-    public static float getMaxK0() {
-        return Municipality.maxK0;
     }
     
 }

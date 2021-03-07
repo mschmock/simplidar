@@ -2,7 +2,6 @@
 //Datum: 13.02.2021
 package ch.manuel.simplidar;
 
-// load lidar-datas from asc-file
 import ch.manuel.simplidar.raster.DataManager;
 import ch.manuel.simplidar.gui.MainFrame;
 import ch.manuel.utilities.MyUtilities;
@@ -17,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+// load lidar-datas from asc-file
 public class LoaderASC implements Runnable {
 
     // class attributes

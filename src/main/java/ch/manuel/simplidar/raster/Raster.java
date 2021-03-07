@@ -4,6 +4,8 @@ package ch.manuel.simplidar.raster;
 
 import ch.manuel.simplidar.calculation.Point;
 
+
+// data-holder for raster
 public class Raster {
 
     // class attributes
@@ -134,11 +136,7 @@ public class Raster {
     // PRIVATE FUNCTIONS
     // check, if bounds are ok
     private boolean checkBounds() {
-        if ((this.nbCols > 0) && (this.nbRows > 0)) {
-            return true;
-        } else {
-            return false;
-        }
+        return (this.nbCols > 0) && (this.nbRows > 0);
     }
 
 }
