@@ -14,19 +14,20 @@ public class Startup {
     
     // class attributes
     private static MainFrame mainFrame;
-    private static DataManager rasterData;
-    private static String defaultPath;
+    private static DataManager manager;
+    private static DataLoader appData;
     
     public static void main(String[] args) {
         
         // Create Data Object
-        rasterData = new DataManager();
+        manager = new DataManager();
         
         // Set Look and Feel
         MyUtilities.setLaF("Windows");
         
-        // define default path
-        loadDefaultPath();
+        // load app data
+        appData = new DataLoader();
+        appData.loadData();
         
          /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -37,14 +38,7 @@ public class Startup {
         });
     }
     
-    // get default path
-    public static String getDefaultPath() {
-        return Startup.defaultPath;
-    }
     
     // PRIVATE FUNCTIONS
-    // load from resources
-    private static void loadDefaultPath() {
-        Startup.defaultPath = MyUtilities.fileFromRes();
-    }
+
 }

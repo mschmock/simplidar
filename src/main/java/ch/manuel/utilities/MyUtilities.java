@@ -205,25 +205,4 @@ public class MyUtilities {
         return Math.sqrt(sq); 
     }
     
-    // file path from resource
-    public static String fileFromRes() {
-            String fileName = "/data/stdPath.txt";
-            String line = "";
-            
-        try {
-            InputStream stream = MyUtilities.class.getResourceAsStream(fileName);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
-            
-            // read line (only 1 line expected)
-            line = reader.readLine();
-            
-//            while ((line = reader.readLine()) != null) {
-//                line += line;
-//            }
-            reader.close();
-        } catch (IOException ex) {
-            Logger.getLogger(MyUtilities.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return line;
-    }
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Save basic datas for the application
+-->
+
+<root>
+    <version>0.9.3</version>
+    <date>07.03.2021</date>
+    <author>Manuel Schmocker</author>
+    <mail>manuel.schmocker@gmail.com</mail>
+    <defaultPath>D:\Temp\LIDAR\LV95</defaultPath>
+
+</root>

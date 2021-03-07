@@ -40,7 +40,7 @@ public class LoaderTiff implements Runnable {
     // procedure to open file
     private static void openTiffFile() {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("geoTiff-Datei", "tif");
-        String defPath = Startup.getDefaultPath();
+        String defPath = DataLoader.getXMLdata("defaultPath");
         String path = MyUtilities.getOpenFileDialog("Datei öffnen", defPath, filter);
         if (path != null) {
             // set file path

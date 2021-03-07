@@ -40,7 +40,7 @@ public class LoaderASC implements Runnable {
     // procedure to open file
     public static void openAscFile() {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC Files", "asc");
-        String defPath = Startup.getDefaultPath();
+        String defPath = DataLoader.getXMLdata("defaultPath");
         String path = MyUtilities.getOpenFileDialog("Datei öffnen", defPath, filter);
         if (path != null) {
             // set file path
