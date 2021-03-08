@@ -68,7 +68,7 @@ public class AnalyseFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        imgPanel = new ch.manuel.simplidar.gui.panels.ImgPanel();
+        imgPanel = new ch.manuel.simplidar.gui.panels.ImgPanelA();
         jButton1 = new javax.swing.JButton();
         jProgressBar1 = new javax.swing.JProgressBar();
         jComboBox1 = new javax.swing.JComboBox<>();

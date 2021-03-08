@@ -16,7 +16,7 @@ import java.text.NumberFormat;
 
 public class Legend {
     // membervariables
-    private ImgPanel imgPanel;
+    private ImgPanelA imgPanel;
     // legend: geometry
     private final int LEN_SEGM = 20;
     private final int OFFS_BORDER = 20;     // distance to border
@@ -31,7 +31,7 @@ public class Legend {
     private NumberFormat formatter;
     
     // Constructor
-    public Legend( ImgPanel imgPanel) {
+    public Legend( ImgPanelA imgPanel) {
         this.imgPanel = imgPanel;
         
     }
