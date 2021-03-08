@@ -28,7 +28,7 @@ public class RasterFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        customPanel = new ch.manuel.simplidar.graphics.PolygonPanel();
+        customPanel = new ch.manuel.simplidar.gui.panels.PolygonPanel();
         jButton1 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
 
@@ -97,7 +97,7 @@ public class RasterFrame extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private static ch.manuel.simplidar.graphics.PolygonPanel customPanel;
+    private static ch.manuel.simplidar.gui.panels.PolygonPanel customPanel;
     private static javax.swing.JButton jButton1;
     private static javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables

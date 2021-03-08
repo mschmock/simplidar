@@ -1,7 +1,7 @@
 //Autor: Manuel Schmocker
 //Datum: 02.04.2020
 
-package ch.manuel.simplidar.graphics;
+package ch.manuel.simplidar.geodata;
 
 
 import java.util.ArrayList;

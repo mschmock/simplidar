@@ -3,7 +3,7 @@
 package ch.manuel.simplidar;
 
 import ch.manuel.utilities.MyUtilities;
-import ch.manuel.simplidar.graphics.GeoData;
+import ch.manuel.simplidar.geodata.GeoData;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;

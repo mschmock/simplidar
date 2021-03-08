@@ -1,18 +1,24 @@
 //Autor: Manuel Schmocker
 //Datum: 02.04.2020
 
-package ch.manuel.simplidar.graphics;
+package ch.manuel.simplidar.gui.panels;
 
 import ch.manuel.simplidar.DataLoader;
+import ch.manuel.simplidar.geodata.GeoData;
+import ch.manuel.simplidar.geodata.Municipality;
 import ch.manuel.simplidar.gui.RasterFrame;
+import ch.manuel.simplidar.raster.DataManager;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,8 +31,6 @@ public class PolygonPanel extends JPanel {
 
     // list polygons
     private static List<Polygon> listPoly; 
-    // legend (in jPanel)
-    private static Legend legend;
     // transformation
     private final AffineTransform tx;
     private static final int pxBORDER = 16;                     // border in pixel
@@ -45,13 +49,8 @@ public class PolygonPanel extends JPanel {
         PolygonPanel.absoluteRes = true;
         listPoly = new ArrayList<>();
         mapID = new HashMap<Integer,Municipality>();
-        
         // get polygons from geoData
         initPolygons();
-        
-        // legend
-        legend = new Legend( this );
-        
         // init transformation
         this.tx = new AffineTransform();
 
@@ -87,6 +86,9 @@ public class PolygonPanel extends JPanel {
             calcTransformation();
             // draw polygons 
             drawBorder( g2 );
+            
+            // draw raster bounds
+            drawRasterBounds( g2 );
         }
     }
     
@@ -116,7 +118,7 @@ public class PolygonPanel extends JPanel {
         tx.concatenate(trans);
     }
     
-    
+    // draw borders of municipalities
     private void drawBorder(Graphics2D g2) {
         g2.setStroke(new BasicStroke(1));
         g2.setColor( Color.black );
@@ -127,6 +129,20 @@ public class PolygonPanel extends JPanel {
         }  
     }
     
+    // draw borders of municipalities
+    private void drawRasterBounds(Graphics2D g2) {
+        g2.setStroke(new BasicStroke(1));
+        g2.setColor( Color.red );
+        
+        double x = DataManager.mainRaster.getXmin();
+        double y = DataManager.mainRaster.getYmax();
+        double w = DataManager.mainRaster.getXmax() - x;
+        double h = y - DataManager.mainRaster.getYmin();
+        
+        Shape shape = this.tx.createTransformedShape( new Rectangle2D.Double(x, y, w, h) );
+        g2.draw(shape);            
+
+    }
     
     // draw infections per municipality
 //    private void drawInfections(Graphics2D g2) {
