@@ -1,8 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+//Autor: Manuel Schmocker
+//Datum: 08.03.2021
+
 package ch.manuel.simplidar.gui;
 
 import ch.manuel.simplidar.calculation.RasterAnalyser;
@@ -37,7 +35,8 @@ public class AnalyseFrame extends javax.swing.JFrame {
         AnalyseFrame.jProgressBar1.setValue(val);
     }
 
-    public static void repaintImg() {
+    public static void repaintImg(boolean boo) {
+        AnalyseFrame.imgPanel.setHasLegend(boo);
         AnalyseFrame.imgPanel.repaint();
     }
 
@@ -68,28 +67,17 @@ public class AnalyseFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        imgPanel = new ch.manuel.simplidar.gui.panels.ImgPanelA();
         jButton1 = new javax.swing.JButton();
         jProgressBar1 = new javax.swing.JProgressBar();
         jComboBox1 = new javax.swing.JComboBox<>();
         jSlider1 = new javax.swing.JSlider();
         jLabel1 = new javax.swing.JLabel();
+        imgPanel = new ch.manuel.simplidar.gui.panels.ImgPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Data Viewer");
         setMinimumSize(new java.awt.Dimension(500, 320));
         setPreferredSize(new java.awt.Dimension(500, 320));
-
-        javax.swing.GroupLayout imgPanelLayout = new javax.swing.GroupLayout(imgPanel);
-        imgPanel.setLayout(imgPanelLayout);
-        imgPanelLayout.setHorizontalGroup(
-            imgPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 500, Short.MAX_VALUE)
-        );
-        imgPanelLayout.setVerticalGroup(
-            imgPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 246, Short.MAX_VALUE)
-        );
 
         jButton1.setText("Analyse");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -116,11 +104,21 @@ public class AnalyseFrame extends javax.swing.JFrame {
 
         jLabel1.setText("Belichtung");
 
+        javax.swing.GroupLayout imgPanelLayout = new javax.swing.GroupLayout(imgPanel);
+        imgPanel.setLayout(imgPanelLayout);
+        imgPanelLayout.setHorizontalGroup(
+            imgPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        imgPanelLayout.setVerticalGroup(
+            imgPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 246, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(imgPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -130,11 +128,12 @@ public class AnalyseFrame extends javax.swing.JFrame {
                         .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 126, Short.MAX_VALUE)
                         .addComponent(jLabel1)
                         .addGap(18, 18, 18)
                         .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
+            .addComponent(imgPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -173,7 +172,7 @@ public class AnalyseFrame extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private static javax.swing.JPanel imgPanel;
+    private static ch.manuel.simplidar.gui.panels.ImgPanel imgPanel;
     private static javax.swing.JButton jButton1;
     private static javax.swing.JComboBox<String> jComboBox1;
     private static javax.swing.JLabel jLabel1;

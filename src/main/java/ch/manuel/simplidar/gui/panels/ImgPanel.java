@@ -1,28 +1,54 @@
 //Autor: Manuel Schmocker
 //Datum: 13.02.2021
+
 package ch.manuel.simplidar.gui.panels;
 
 import ch.manuel.simplidar.gui.AnalyseFrame;
+import ch.manuel.simplidar.raster.DataManager;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import javax.swing.JPanel;
 
-public class ImgPanelA extends JPanel {
 
+// draw panel with raster-data (RasterAnalyser.java)
+public class ImgPanel extends JPanel {
+    
+    // class attributes
+    private static boolean hasLegend;      // drawLegend yes / no
+    
+    // CONSTRUCTOR
+    public ImgPanel() {
+        hasLegend = false;
+    }
+    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
         // draw image
         drawScaledImage(g);
         // draw legend
-        boolean boo;
-        
+        if(hasLegend) {
+            showLegende(g2);
+        }
+    }
+    
+    // PUBLIC FUNCTIONS
+    // set switch draw legend
+    public void setHasLegend(boolean boo) {
+        hasLegend = boo;
     }
     
     // PRIVATE FUNCTIONS
     // draw legend
-    private void setLegende() {
+    private void showLegende(Graphics2D g2) {
         // legend (in jPanel)
         Legend legend = new Legend( this );
+        double maxRough = DataManager.getMaxRoughness();
+        legend.setMaxVal( maxRough );           // max value
+        legend.setLogScale( true );             // logarithmic scale
+        // draw legend
+        legend.drawLegend( g2 );
     }
     
     // scale image

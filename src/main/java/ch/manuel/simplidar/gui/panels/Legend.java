@@ -1,10 +1,9 @@
 //Autor: Manuel Schmocker
-//Datum: 02.05.2020
+//Datum: 08.03.2021
 
 
 package ch.manuel.simplidar.gui.panels;
 
-// Legend in main plot (Class PolygonPanel.java)
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -14,9 +13,10 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 
+// create legend in  plot (Class ImgPanel.java)
 public class Legend {
     // membervariables
-    private ImgPanelA imgPanel;
+    private ImgPanel imgPanel;
     // legend: geometry
     private final int LEN_SEGM = 20;
     private final int OFFS_BORDER = 20;     // distance to border
@@ -31,7 +31,7 @@ public class Legend {
     private NumberFormat formatter;
     
     // Constructor
-    public Legend( ImgPanelA imgPanel) {
+    public Legend( ImgPanel imgPanel) {
         this.imgPanel = imgPanel;
         
     }

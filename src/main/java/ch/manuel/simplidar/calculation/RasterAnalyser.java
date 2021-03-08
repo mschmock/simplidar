@@ -10,8 +10,9 @@ import java.awt.Color;
 public class RasterAnalyser implements Runnable {
 
     // class attributes
-    private boolean isUpToDate;     // normal to cluster (regression)
+    private static boolean isUpToDate;      // normal to cluster (regression)
 
+    
     @Override
     public void run() {
         // start raster analyse
@@ -19,34 +20,37 @@ public class RasterAnalyser implements Runnable {
         // show result in image
         showInclination(true);
         // repaint img
-        AnalyseFrame.repaintImg();
-    }
-
-    // analyse cluster
-    private static void startAnalyse() {
-        DataManager.analyseCluster();
+        AnalyseFrame.repaintImg(false);
     }
 
     // PUBLIC FUNCTIONS
+    // draw information based on selection
     public static void updateImg(int selection) {
+        boolean drawLegend;
+        // select case (drop down in AnalyseFrame.java)
         switch (selection) {
             case 0:
+                drawLegend = false;
                 showInclination(true);
                 break;
             case 1:
+                drawLegend = false;
                 showInclination(false);
                 break;
             case 2:
+                drawLegend = false;
                 showOrientation();
                 break;
             case 3:
+                drawLegend = true;
                 showRoughness();
                 break;
             default:
+                drawLegend = false;
                 showInclination(true);
         }
         // repaint img
-        AnalyseFrame.repaintImg();
+        AnalyseFrame.repaintImg(drawLegend);
     }
 
     // update dynamically 
@@ -69,11 +73,17 @@ public class RasterAnalyser implements Runnable {
                 AnalyseFrame.getImg().setRGB(i, j, col);
             }
         }
-        // repaint img
-        AnalyseFrame.repaintImg();
+        // repaint img: without legend -> false
+        AnalyseFrame.repaintImg(false);
     }
 
+    
     // PRIVATE FUNCTIONS
+        // analyse cluster
+    private static void startAnalyse() {
+        DataManager.analyseCluster();
+    }
+    
     // show inclination of cluster element: true -> inclination from vertical
     private static void showInclination(boolean top) {
         int sizeX = DataManager.getClusterSizeX();
@@ -96,6 +106,7 @@ public class RasterAnalyser implements Runnable {
         }
     }
 
+    // show orientation of cluster: N - O - S - W
     private static void showOrientation() {
         int sizeX = DataManager.getClusterSizeX();
         int sizeY = DataManager.getClusterSizeY();
@@ -114,6 +125,7 @@ public class RasterAnalyser implements Runnable {
         }
     }
 
+    // show roughness
     private static void showRoughness() {
         int sizeX = DataManager.getClusterSizeX();
         int sizeY = DataManager.getClusterSizeY();
