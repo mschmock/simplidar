@@ -13,7 +13,6 @@ import javax.swing.SpinnerNumberModel;
 public class MainFrame extends javax.swing.JFrame {
 
     // load and save
-    private static LoaderASC loadObjAsc;
     private static LoaderTiff loadObjTif;
     // calculation
     private static Thread t1;                   // LOAD file thread
@@ -25,7 +24,6 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         // load object
-        loadObjAsc = new LoaderASC();
         loadObjTif = new LoaderTiff();
     }
 
@@ -252,9 +250,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // Load file
-        t1 = new Thread(loadObjAsc);
-        t1.start();
+        // to be implemented
 
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -273,8 +269,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
         // Load file: Asc
-        t1 = new Thread(loadObjAsc);
-        t1.start();
+        RasterManager.loadMainRasterFromAsc();
     }//GEN-LAST:event_jMenuItem11ActionPerformed
 
     private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
