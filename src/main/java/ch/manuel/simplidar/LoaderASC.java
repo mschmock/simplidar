@@ -2,8 +2,8 @@
 //Datum: 13.02.2021
 package ch.manuel.simplidar;
 
-import ch.manuel.simplidar.raster.RasterManager;
 import ch.manuel.simplidar.gui.MainFrame;
+import ch.manuel.simplidar.raster.Raster;
 import ch.manuel.utilities.MyUtilities;
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,77 +17,77 @@ import java.util.Arrays;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 // load lidar-datas from asc-file
-public class LoaderASC implements Runnable {
+public class LoaderASC {
 
     // class attributes
     private static final Charset utf8 = StandardCharsets.UTF_8;
-    private static File ascFile;
-    private static int nbRowsHeader;
+    private File ascFile;
+    private Raster raster;
+//    private int nbRowsHeader;
+    // load thread and object
+    private Thread t1;                  // LOAD file thread
+    private LoadThread loader;          // subclass with runnable --> load file
     // check header & file: -> return true if ok
-    private static boolean[] statusHeader;
-    private static boolean fileOK;
+    private boolean[] statusHeader;
+    private boolean fileOK;
 
-    // ABSTRACT METHODES
-    @Override
-    public void run() {
-        // load
-        LoaderASC.openAscFile();
+    // CONSTRUCTOR
+    public LoaderASC(Raster raster) {
+        this.raster = raster;
+        loader = new LoadThread();
+        openFileDialog();
     }
 
     // PUBLIC FUNCTIONS
+    // get header informations
+    public boolean getHeader() {
+        readHeader();
+        return (getHeaderStatus() && fileOK);
+    }
+    
+    // open file in thread
+    public void openFile() {
+        t1 = new Thread(loader);
+        t1.start();
+    }
     
     // PRIVATE FUNCTIONS
-    // procedure to open file
-    public static void openAscFile() {
+    // open file dialog
+    private void openFileDialog() {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC Files", "asc");
         String defPath = DataLoader.getXMLdata("defaultPath");
         String path = MyUtilities.getOpenFileDialog("Datei öffnen", defPath, filter);
         if (path != null) {
             // set file path
-            LoaderASC.ascFile = new File(path);
-            // reset file status
-            LoaderASC.resetHeaderStatus();
-            // check file header
-            LoaderASC.readHeader();
-        }
-        // continue, if header is OK
-        if( getHeaderStatus() && fileOK) {
-            // init Raster
-            boolean isOK = RasterManager.mainRaster.initRaster();
-            if( isOK ) {
-                // show header datas
-                MainFrame.showRasterValues();
-                // read file
-                LoaderASC.readFile();
-            } else {
-                // show text in gui
-                MainFrame.setText("Datenfeld Raster kann nicht initialisiert werden");
-            }
+            this.ascFile = new File(path);
         }
     }
-    
+
     // reset header status
-    private static void resetHeaderStatus() {
-        LoaderASC.statusHeader = new boolean[] {false, false, false, false, false, false};
+    private void resetHeaderStatus() {
+        statusHeader = new boolean[]{false, false, false, false, false, false};
         fileOK = false;
-        nbRowsHeader = 0;
+//        nbRowsHeader = 0;
     }
-    
+
     // get status header
-    private static boolean getHeaderStatus() {
-        return !Arrays.asList(statusHeader).contains(false);
+    private boolean getHeaderStatus() {
+        for(boolean b : statusHeader) if(!b) return false;
+        return true;
     }
-    
+
     // ____READ FILE: 1. ONLY HEADER
     // check header of file
-    private static void readHeader() {
+    private void readHeader() {
+        // reset file status
+        resetHeaderStatus();
         // status message
         String statusMsg = "Header OK";
         fileOK = true;
 
         // set bufferedReader
         try {
-            FileInputStream fis = new FileInputStream(LoaderASC.ascFile);
+            FileInputStream fis = new FileInputStream(ascFile);
             InputStreamReader isr = new InputStreamReader(fis, utf8);
             BufferedReader br = new BufferedReader(isr);
 
@@ -95,16 +95,16 @@ public class LoaderASC implements Runnable {
             int nbLines = 0;
 
             // line by line
-            while (((line = br.readLine()) != null) && (nbLines < 5)) {
+            while (((line = br.readLine()) != null) && (nbLines < 6)) {
 
                 // read & process the line
                 readHeaderLine(line);
                 nbLines++;
             }
             br.close();
-            
+
             // set number of rows in header
-            nbRowsHeader = nbLines;
+//            nbRowsHeader = nbLines;
 
         } catch (FileNotFoundException e) {
             fileOK = false;
@@ -114,8 +114,10 @@ public class LoaderASC implements Runnable {
             statusMsg = e.getMessage();
         }
         // calculate bounds from  xllcorner / yllcorner 
-        if( fileOK ) {
-            RasterManager.mainRaster.calcBounds();
+        if (getHeaderStatus() && fileOK) {
+            raster.calcBounds();
+        } else {
+            statusMsg = "Header nicht korrekt formatiert!";
         }
         // show text in gui
         MainFrame.setText(statusMsg);
@@ -123,43 +125,43 @@ public class LoaderASC implements Runnable {
 
     // ____READ FILE: 2. WHOLE FILE
     // read file
-    private static void readFile() {
+    private void readFile() {
         // Error message
         String statusMsg = "Alles OK";
         // set bufferedReader
         try {
-            FileInputStream fis = new FileInputStream(LoaderASC.ascFile);
+            FileInputStream fis = new FileInputStream(ascFile);
             InputStreamReader isr = new InputStreamReader(fis, utf8);
             BufferedReader br = new BufferedReader(isr);
-            
+
             String line = null;
             int nbLines = 0;
-  
+
             // read the whole file
-            int nbLinesExp = RasterManager.mainRaster.getNbRows();
+            int nbLinesExp = raster.getNbRows();
 
             // line by line
             while ((line = br.readLine()) != null) {
                 String[] substr;
                 substr = line.split(" ");
-                
+
                 //skip lines of header: non numeric value in pos '0'
                 if (MyUtilities.isNumeric(substr[0])) {
                     // check expected nb of elements
-                    if (substr.length == RasterManager.mainRaster.getNbCols()) {
+                    if (substr.length == raster.getNbCols()) {
                         for (int i = 0; i < substr.length; i++) {
-                            RasterManager.mainRaster.setElement(nbLines, i, Double.parseDouble(substr[i]));
+                            raster.setElement(nbLines, i, Double.parseDouble(substr[i]));
                         }
                     }
                     // show progress
                     MainFrame.setText("Fortschritt: " + (int) (++nbLines * 100.0 / nbLinesExp) + " %");
                 }
             }
-            
+
             statusMsg += "\nLinien geladen: " + nbLines;
             br.close();
-        
-            if (nbLines != RasterManager.mainRaster.getNbRows()) {
+
+            if (nbLines != raster.getNbRows()) {
                 // error
                 fileOK = false;
                 statusMsg = "Datei ist nicht korrekt formatiert!";
@@ -178,7 +180,7 @@ public class LoaderASC implements Runnable {
     }
 
     // read & check line of header
-    private static void readHeaderLine(String line) {
+    private void readHeaderLine(String line) {
         /*
         Header Format:
                 ncols 8750
@@ -196,7 +198,7 @@ public class LoaderASC implements Runnable {
             int val = testLnInt(line);
             // if value ok -> write to class RasterData
             if (val != 0) {
-                RasterManager.mainRaster.setNbCols(val);
+                raster.setNbCols(val);
                 statusHeader[0] = true;
             }
         }
@@ -206,7 +208,7 @@ public class LoaderASC implements Runnable {
             int val = testLnInt(line);
             // if value ok -> write to class RasterData
             if (val != 0) {
-                RasterManager.mainRaster.setNbRows(val);
+                raster.setNbRows(val);
                 statusHeader[1] = true;
             }
         }
@@ -216,7 +218,7 @@ public class LoaderASC implements Runnable {
             int val = testLnInt(line);
             // if value ok -> write to class RasterData
             if (val != 0) {
-                RasterManager.mainRaster.setXLLcorner(val);
+                raster.setXLLcorner(val);
                 statusHeader[2] = true;
             }
         }
@@ -226,7 +228,7 @@ public class LoaderASC implements Runnable {
             int val = testLnInt(line);
             // if value ok -> write to class RasterData
             if (val != 0) {
-                RasterManager.mainRaster.setYLLcorner(val);
+                raster.setYLLcorner(val);
                 statusHeader[3] = true;
             }
         }
@@ -236,7 +238,7 @@ public class LoaderASC implements Runnable {
             double val = testLnDouble(line);
             // if value ok -> write to class RasterData
             if (val != 0) {
-                RasterManager.mainRaster.setCellsize(val);
+                raster.setCellsize(val);
                 statusHeader[4] = true;
             }
         }
@@ -245,10 +247,8 @@ public class LoaderASC implements Runnable {
             // check value: Numeric int value on 2. position
             int val = testLnInt(line);
             // if value ok -> write to class RasterData
-            if (val != 0) {
-                RasterManager.mainRaster.setNoDataVal(val);
-                statusHeader[5] = true;
-            }
+            raster.setNoDataVal(val);
+            statusHeader[5] = true;
         }
     }
 
@@ -279,4 +279,14 @@ public class LoaderASC implements Runnable {
         // all OK
         return Double.parseDouble(substr[1]);
     }
+
+    // inner class with separate thrad
+    // loader for asc-file
+    private class LoadThread implements Runnable {
+        @Override
+        public void run() {
+            LoaderASC.this.readFile();
+        }
+    }
+
 }
