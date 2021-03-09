@@ -1,29 +1,14 @@
 //Autor: Manuel Schmocker
-//Datum: 13.02.2021
+//Datum: 09.03.2021
 
 package ch.manuel.simplidar.raster;
 
-import ch.manuel.simplidar.calculation.RasterAnalyser;
+// Data-holder for clusters
+
 import ch.manuel.simplidar.gui.AnalyseFrame;
+import static ch.manuel.simplidar.raster.RasterManager.mainRaster;
 
-/*
-Header Format:
-    ncols 8750
-    nrows 6000
-    xllcorner 2628750
-    yllcorner 1173000
-    cellsize 0.5
-    nodata_value 0
-*/
-public class DataManager {
-
-    // raster objects
-    public static Raster mainRaster;           // main raster
-    public static Raster subRaster_1;          // sub raster (merge procedure)
-    public static Raster subRaster_2;          // sub raster (merge procedure)
-    public static Raster subRaster_3;          // sub raster (merge procedure)
-    public static Raster subRaster_4;          // sub raster (merge procedure)
-
+public class ClusterManager {
     // cluster object
     private static final int size = 10;
     private static int sizeCluX;
@@ -31,21 +16,13 @@ public class DataManager {
     private static Cluster[][] mainCluster;
     private static double maxRoughness;
     
-    // rasterAnalyser object
-    public static RasterAnalyser analyser;
+    // CONSTRUCTOR
+//    public ClusterManager() {
+//        sizeCluX = 1;
+//        sizeCluY = 1;
+//    }
     
-    // Constructor
-    public DataManager() {
-        // datas from raster
-        mainRaster = new Raster();
-        subRaster_1 = new Raster();
-        subRaster_2 = new Raster();
-        subRaster_3 = new Raster();
-        subRaster_4 = new Raster();
-        // analyser
-        analyser = new RasterAnalyser();
-    }
-
+    
     // GETTER
     public static Cluster getElement(int i, int j) {
         return mainCluster[i][j];
@@ -62,7 +39,7 @@ public class DataManager {
     public static double getMaxRoughness() {
         return maxRoughness;
     }
-
+    
     // PUBLIC FUNCTIONS
     // create data holder for mainCluster
     public static void initClusters() {
@@ -72,7 +49,8 @@ public class DataManager {
         mainCluster = new Cluster[sizeCluX][sizeCluY];
         
     }
-    // analyse cluster
+    
+        // analyse cluster
     public static void analyseCluster() {
         for (int i = 0; i < sizeCluX; i++) {
             for (int j = 0; j < sizeCluY; j++) {
@@ -107,4 +85,7 @@ public class DataManager {
             }
         }
     }
+    
+    
+    
 }

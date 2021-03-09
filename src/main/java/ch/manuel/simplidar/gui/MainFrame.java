@@ -5,7 +5,7 @@ package ch.manuel.simplidar.gui;
 import ch.manuel.simplidar.LoaderASC;
 import ch.manuel.simplidar.LoaderTiff;
 import ch.manuel.simplidar.calculation.Calculation;
-import ch.manuel.simplidar.raster.DataManager;
+import ch.manuel.simplidar.raster.RasterManager;
 import java.text.DecimalFormat;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
@@ -38,27 +38,27 @@ public class MainFrame extends javax.swing.JFrame {
     // show raster values
     public static void showRasterValues() {
         DecimalFormat myFormatter = new DecimalFormat("###,###");
-        String nbCols = myFormatter.format(DataManager.mainRaster.getNbCols());
-        String nbRows = myFormatter.format(DataManager.mainRaster.getNbRows());
-        String xMin = myFormatter.format(DataManager.mainRaster.getXmin());
-        String xMax = myFormatter.format(DataManager.mainRaster.getXmax());
-        String yMin = myFormatter.format(DataManager.mainRaster.getYmin());
-        String yMax = myFormatter.format(DataManager.mainRaster.getYmax());
+        String nbCols = myFormatter.format(RasterManager.mainRaster.getNbCols());
+        String nbRows = myFormatter.format(RasterManager.mainRaster.getNbRows());
+        String xMin = myFormatter.format(RasterManager.mainRaster.getXmin());
+        String xMax = myFormatter.format(RasterManager.mainRaster.getXmax());
+        String yMin = myFormatter.format(RasterManager.mainRaster.getYmin());
+        String yMax = myFormatter.format(RasterManager.mainRaster.getYmax());
         
         // text raster-data
         String rasterData;
         rasterData = "Anzahl Spalten:\t" + nbCols;
         rasterData += "\nAnzahl Linien:\t" + nbRows;
-        rasterData += "\nZellgr\u00f6sse:\t" + String.valueOf(DataManager.mainRaster.getCellsize());
-        rasterData += "\nNoData-Wert:\t" + String.valueOf(String.valueOf(DataManager.mainRaster.getNoDataVal()));
+        rasterData += "\nZellgr\u00f6sse:\t" + String.valueOf(RasterManager.mainRaster.getCellsize());
+        rasterData += "\nNoData-Wert:\t" + String.valueOf(String.valueOf(RasterManager.mainRaster.getNoDataVal()));
         rasterData += "\nGrenzen X-Min: " + xMin + " / X-Max: " + xMax;        
         rasterData += "\nGrenzen Y-Min: " + yMin + " / Y-Max: " + yMax;        
         MainFrame.jTextArea2.setText(rasterData);
         
         // set spinner values
-        SpinnerModel sm = new SpinnerNumberModel(1, 1, DataManager.mainRaster.getNbCols(), 1);  //default value,lower bound,upper bound,increment by
+        SpinnerModel sm = new SpinnerNumberModel(1, 1, RasterManager.mainRaster.getNbCols(), 1);  //default value,lower bound,upper bound,increment by
         MainFrame.jSpinner21.setModel(sm);
-        sm = new SpinnerNumberModel(1, 1, DataManager.mainRaster.getNbRows(), 1);               //default value,lower bound,upper bound,increment by
+        sm = new SpinnerNumberModel(1, 1, RasterManager.mainRaster.getNbRows(), 1);               //default value,lower bound,upper bound,increment by
         MainFrame.jSpinner22.setModel(sm);
     }
 

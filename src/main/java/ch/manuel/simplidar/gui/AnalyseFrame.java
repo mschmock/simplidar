@@ -4,7 +4,8 @@
 package ch.manuel.simplidar.gui;
 
 import ch.manuel.simplidar.calculation.RasterAnalyser;
-import ch.manuel.simplidar.raster.DataManager;
+import ch.manuel.simplidar.raster.ClusterManager;
+import ch.manuel.simplidar.raster.RasterManager;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
@@ -18,10 +19,12 @@ public class AnalyseFrame extends javax.swing.JFrame {
     public AnalyseFrame() {
         initComponents();
 
-        DataManager.initClusters();
+        ClusterManager.initClusters();
 
-        int sizeX = DataManager.getClusterSizeX();
-        int sizeY = DataManager.getClusterSizeY();
+        int sizeX = ClusterManager.getClusterSizeX();
+        int sizeY = ClusterManager.getClusterSizeY();
+        sizeX = sizeX < 1 ? 1 : sizeX;
+        sizeY = sizeY < 1 ? 1 : sizeY;
         image = new BufferedImage(sizeX, sizeY, BufferedImage.TYPE_INT_ARGB);    //Bild erstellen
 
         // init image
@@ -48,8 +51,8 @@ public class AnalyseFrame extends javax.swing.JFrame {
     // PRIVATE FUNCTION
     // fill image white
     private static void setPixels() {
-        int sizeX = DataManager.getClusterSizeX();
-        int sizeY = DataManager.getClusterSizeY();
+        int sizeX = ClusterManager.getClusterSizeX();
+        int sizeY = ClusterManager.getClusterSizeY();
         //Pixel einfärben
         for (int i = 0; i < sizeX; i++) {
             for (int j = 0; j < sizeY; j++) {
@@ -157,7 +160,7 @@ public class AnalyseFrame extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // Load file
-        t1 = new Thread(DataManager.analyser);
+        t1 = new Thread(RasterManager.analyser);
         t1.start();
     }//GEN-LAST:event_jButton1ActionPerformed
 

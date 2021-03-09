@@ -2,7 +2,7 @@
 //Datum: 13.02.2021
 package ch.manuel.simplidar;
 
-import ch.manuel.simplidar.raster.DataManager;
+import ch.manuel.simplidar.raster.RasterManager;
 import ch.manuel.simplidar.gui.MainFrame;
 import ch.manuel.utilities.MyUtilities;
 import java.io.BufferedReader;
@@ -53,7 +53,7 @@ public class LoaderASC implements Runnable {
         // continue, if header is OK
         if( getHeaderStatus() && fileOK) {
             // init Raster
-            boolean isOK = DataManager.mainRaster.initRaster();
+            boolean isOK = RasterManager.mainRaster.initRaster();
             if( isOK ) {
                 // show header datas
                 MainFrame.showRasterValues();
@@ -115,7 +115,7 @@ public class LoaderASC implements Runnable {
         }
         // calculate bounds from  xllcorner / yllcorner 
         if( fileOK ) {
-            DataManager.mainRaster.calcBounds();
+            RasterManager.mainRaster.calcBounds();
         }
         // show text in gui
         MainFrame.setText(statusMsg);
@@ -136,7 +136,7 @@ public class LoaderASC implements Runnable {
             int nbLines = 0;
   
             // read the whole file
-            int nbLinesExp = DataManager.mainRaster.getNbRows();
+            int nbLinesExp = RasterManager.mainRaster.getNbRows();
 
             // line by line
             while ((line = br.readLine()) != null) {
@@ -146,9 +146,9 @@ public class LoaderASC implements Runnable {
                 //skip lines of header: non numeric value in pos '0'
                 if (MyUtilities.isNumeric(substr[0])) {
                     // check expected nb of elements
-                    if (substr.length == DataManager.mainRaster.getNbCols()) {
+                    if (substr.length == RasterManager.mainRaster.getNbCols()) {
                         for (int i = 0; i < substr.length; i++) {
-                            DataManager.mainRaster.setElement(nbLines, i, Double.parseDouble(substr[i]));
+                            RasterManager.mainRaster.setElement(nbLines, i, Double.parseDouble(substr[i]));
                         }
                     }
                     // show progress
@@ -159,7 +159,7 @@ public class LoaderASC implements Runnable {
             statusMsg += "\nLinien geladen: " + nbLines;
             br.close();
         
-            if (nbLines != DataManager.mainRaster.getNbRows()) {
+            if (nbLines != RasterManager.mainRaster.getNbRows()) {
                 // error
                 fileOK = false;
                 statusMsg = "Datei ist nicht korrekt formatiert!";
@@ -196,7 +196,7 @@ public class LoaderASC implements Runnable {
             int val = testLnInt(line);
             // if value ok -> write to class RasterData
             if (val != 0) {
-                DataManager.mainRaster.setNbCols(val);
+                RasterManager.mainRaster.setNbCols(val);
                 statusHeader[0] = true;
             }
         }
@@ -206,7 +206,7 @@ public class LoaderASC implements Runnable {
             int val = testLnInt(line);
             // if value ok -> write to class RasterData
             if (val != 0) {
-                DataManager.mainRaster.setNbRows(val);
+                RasterManager.mainRaster.setNbRows(val);
                 statusHeader[1] = true;
             }
         }
@@ -216,7 +216,7 @@ public class LoaderASC implements Runnable {
             int val = testLnInt(line);
             // if value ok -> write to class RasterData
             if (val != 0) {
-                DataManager.mainRaster.setXLLcorner(val);
+                RasterManager.mainRaster.setXLLcorner(val);
                 statusHeader[2] = true;
             }
         }
@@ -226,7 +226,7 @@ public class LoaderASC implements Runnable {
             int val = testLnInt(line);
             // if value ok -> write to class RasterData
             if (val != 0) {
-                DataManager.mainRaster.setYLLcorner(val);
+                RasterManager.mainRaster.setYLLcorner(val);
                 statusHeader[3] = true;
             }
         }
@@ -236,7 +236,7 @@ public class LoaderASC implements Runnable {
             double val = testLnDouble(line);
             // if value ok -> write to class RasterData
             if (val != 0) {
-                DataManager.mainRaster.setCellsize(val);
+                RasterManager.mainRaster.setCellsize(val);
                 statusHeader[4] = true;
             }
         }
@@ -246,7 +246,7 @@ public class LoaderASC implements Runnable {
             int val = testLnInt(line);
             // if value ok -> write to class RasterData
             if (val != 0) {
-                DataManager.mainRaster.setNoDataVal(val);
+                RasterManager.mainRaster.setNoDataVal(val);
                 statusHeader[5] = true;
             }
         }

@@ -5,7 +5,7 @@
 package ch.manuel.simplidar;
 
 import ch.manuel.simplidar.gui.MainFrame;
-import ch.manuel.simplidar.raster.DataManager;
+import ch.manuel.simplidar.raster.RasterManager;
 import ch.manuel.utilities.MyUtilities;
 
 
@@ -14,13 +14,13 @@ public class Startup {
     
     // class attributes
     private static MainFrame mainFrame;
-    private static DataManager manager;
+    private static RasterManager manager;
     private static DataLoader appData;
     
     public static void main(String[] args) {
         
         // Create Data Object
-        manager = new DataManager();
+        manager = new RasterManager();
         
         // Set Look and Feel
         MyUtilities.setLaF("Windows");

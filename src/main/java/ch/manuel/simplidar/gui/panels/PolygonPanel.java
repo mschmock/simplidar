@@ -7,7 +7,7 @@ import ch.manuel.simplidar.DataLoader;
 import ch.manuel.simplidar.geodata.GeoData;
 import ch.manuel.simplidar.geodata.Municipality;
 import ch.manuel.simplidar.gui.RasterFrame;
-import ch.manuel.simplidar.raster.DataManager;
+import ch.manuel.simplidar.raster.RasterManager;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -131,10 +131,10 @@ public class PolygonPanel extends JPanel {
         g2.setStroke(new BasicStroke(1));
         g2.setColor( Color.red );
         
-        double x = DataManager.mainRaster.getXmin();
-        double y = DataManager.mainRaster.getYmax();
-        double w = DataManager.mainRaster.getXmax() - x;
-        double h = y - DataManager.mainRaster.getYmin();
+        double x = RasterManager.mainRaster.getXmin();
+        double y = RasterManager.mainRaster.getYmax();
+        double w = RasterManager.mainRaster.getXmax() - x;
+        double h = y - RasterManager.mainRaster.getYmin();
         
         Shape shape = this.tx.createTransformedShape( new Rectangle2D.Double(x, y, w, h) );
         g2.draw(shape);            

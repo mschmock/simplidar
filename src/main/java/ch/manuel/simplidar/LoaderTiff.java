@@ -1,7 +1,7 @@
 package ch.manuel.simplidar;
 
 import ch.manuel.simplidar.gui.MainFrame;
-import ch.manuel.simplidar.raster.DataManager;
+import ch.manuel.simplidar.raster.RasterManager;
 import ch.manuel.utilities.MyUtilities;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferFloat;
@@ -53,7 +53,7 @@ public class LoaderTiff implements Runnable {
         // continue, if header is OK
         if (fileOK) {
             // init Raster
-            boolean isOK = DataManager.mainRaster.initRaster();
+            boolean isOK = RasterManager.mainRaster.initRaster();
             if (isOK) {
                 // show header datas
                 MainFrame.showRasterValues();
@@ -93,8 +93,8 @@ public class LoaderTiff implements Runnable {
                 // size, pixel width, height
                 LoaderTiff.pixelW = reader.getWidth(0);
                 LoaderTiff.pixelH = reader.getHeight(0);
-                DataManager.mainRaster.setNbCols(pixelW);
-                DataManager.mainRaster.setNbRows(pixelH);
+                RasterManager.mainRaster.setNbCols(pixelW);
+                RasterManager.mainRaster.setNbRows(pixelH);
 
                 // read metadata of first image
                 IIOMetadata metadata = reader.getImageMetadata(0);
@@ -108,8 +108,15 @@ public class LoaderTiff implements Runnable {
                 <TIFFDouble value="2631000.0"/>     --> X Wert für Pixel x1
                 <TIFFDouble value="1172000.0"/>     --> Y-Wert für Pixel y1
                 <TIFFDouble value="0.0"/> */
-                double xMin = val.getAsDouble(3);
-                double yMax = val.getAsDouble(4);
+                double xMin = 0;
+                double yMax = 0;
+                if( val != null) {
+                    xMin = val.getAsDouble(3);
+                    yMax = val.getAsDouble(4);
+                } else {
+                    fileOK = false;
+                    statusMsg = "Datei hat nicht das korrekte Format.";
+                }
 
                 // cellsize
                 TIFFField val2 = ifd.get​TIFFField(33550); // <TIFFField number="33550" name="ModelPixelScaleTag">
@@ -117,7 +124,7 @@ public class LoaderTiff implements Runnable {
                 <TIFFDouble value="0.5"/>       --> Rastergrösse Y
                 <TIFFDouble value="0.0"/>  */
                 double cellsize = val2.getAsDouble(0);
-                DataManager.mainRaster.setCellsize(cellsize);
+                RasterManager.mainRaster.setCellsize(cellsize);
                 if (val2.getAsDouble(0) != val2.getAsDouble(1)) {
                     statusMsg += "\nWarnung: Zellgrösse X und Y sind unterschiedlich";
                 }
@@ -125,13 +132,13 @@ public class LoaderTiff implements Runnable {
                 // set Bounds
                 double xMax = xMin + pixelH * cellsize;
                 double yMin = yMax - pixelW * cellsize;
-                DataManager.mainRaster.setBounds(xMin, xMax, yMin, yMax);
+                RasterManager.mainRaster.setBounds(xMin, xMax, yMin, yMax);
                 
                 // number of bands
                 int nbBands = reader.read(0).getRaster().getNumBands();
                 if (nbBands != 1) {
                     fileOK = false;
-                    statusMsg = "Datei darf nur 1 Band enthalten.";
+                    statusMsg = "\nDatei darf nur 1 Band enthalten.";
                     statusMsg += "\nAnzahl B\u00e4nder:" + nbBands;
                 }
 
@@ -176,7 +183,7 @@ public class LoaderTiff implements Runnable {
 
                     for (int y = 0; y < pixelH; y++) {
                         for (int x = 0; x < pixelW; x++) {
-                            DataManager.mainRaster.setElement(y, x, data[x+y*pixelW]);
+                            RasterManager.mainRaster.setElement(y, x, data[x+y*pixelW]);
                         }
                         // show progress
                         MainFrame.setText("Fortschritt: " + (int) (y * 100.0 / pixelH) + " %");

@@ -108,7 +108,7 @@ public class Cluster {
 
         for (int i = colIndex; i < xEnd; i++) {
             for (int j = rowIndex; j < yEnd; j++) {
-                Point p = DataManager.mainRaster.getPoint(i, j);
+                Point p = RasterManager.mainRaster.getPoint(i, j);
                 AA[nb][0] = p.getX();
                 AA[nb][1] = p.getY();
                 AA[nb][2] = 1.0;
@@ -184,7 +184,7 @@ public class Cluster {
         for (int i = colIndex; i < xEnd; i++) {
             for (int j = rowIndex; j < yEnd; j++) {
 
-                Point p = DataManager.mainRaster.getPoint(i, j);
+                Point p = RasterManager.mainRaster.getPoint(i, j);
                 // calulate |Zplane - Zpoint(i,j)|
                 delta[nb] = Math.abs(getZfromXY(p.getX(), p.getY()) - p.getZ());
                 nb++;

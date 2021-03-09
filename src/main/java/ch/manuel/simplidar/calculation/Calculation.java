@@ -3,7 +3,7 @@
 package ch.manuel.simplidar.calculation;
 
 import ch.manuel.simplidar.gui.MainFrame;
-import ch.manuel.simplidar.raster.DataManager;
+import ch.manuel.simplidar.raster.RasterManager;
 import ch.manuel.utilities.MyUtilities;
 import java.util.Arrays;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
@@ -15,7 +15,7 @@ public class Calculation {
 
     public static void testCalc(int x, int y) {
 
-        Point point = DataManager.mainRaster.getPoint(x - 1, y - 1);
+        Point point = RasterManager.mainRaster.getPoint(x - 1, y - 1);
 
         msg = "X-Koordinate: " + point.getX() + "\n";
         msg += "Y-Koordinate: " + point.getY() + "\n";
