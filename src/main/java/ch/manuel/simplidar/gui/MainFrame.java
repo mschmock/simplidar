@@ -2,8 +2,6 @@
 //Datum: 13.02.2021
 package ch.manuel.simplidar.gui;
 
-import ch.manuel.simplidar.LoaderASC;
-import ch.manuel.simplidar.LoaderTiff;
 import ch.manuel.simplidar.calculation.Calculation;
 import ch.manuel.simplidar.raster.RasterManager;
 import java.text.DecimalFormat;
@@ -12,10 +10,6 @@ import javax.swing.SpinnerNumberModel;
 
 public class MainFrame extends javax.swing.JFrame {
 
-    // load and save
-    private static LoaderTiff loadObjTif;
-    // calculation
-    private static Thread t1;                   // LOAD file thread
     // frame: "analyseFrame"
     private static AnalyseFrame aFrame;         // analyseFrame
     private static RasterFrame rFrame;          // rasterFrame (merge + cut raster)
@@ -23,8 +17,6 @@ public class MainFrame extends javax.swing.JFrame {
     // CONSTRUCTOR
     public MainFrame() {
         initComponents();
-        // load object
-        loadObjTif = new LoaderTiff();
     }
 
     // PUBLIC FUNCTIONS
@@ -274,8 +266,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
         // Load file: Tiff
-        t1 = new Thread(loadObjTif);
-        t1.start();
+        RasterManager.loadMainRasterFromTiff();
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
     private void jMenuItem22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem22ActionPerformed

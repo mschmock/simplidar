@@ -1,7 +1,7 @@
 package ch.manuel.simplidar;
 
 import ch.manuel.simplidar.gui.MainFrame;
-import ch.manuel.simplidar.raster.RasterManager;
+import ch.manuel.simplidar.raster.Raster;
 import ch.manuel.utilities.MyUtilities;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferFloat;
@@ -19,61 +19,59 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-public class LoaderTiff implements Runnable {
+public class LoaderTiff {
 
     // class attributes
-    private static File tiffFile;
-    private static int pixelW;
-    private static int pixelH;
+    private File tiffFile;
+    private Raster raster;
+    private int pixelW;
+    private int pixelH;
+    // load thread and object
+    private Thread t1;                          // LOAD file thread
+    private LoaderTiff.LoadThread loader;       // subclass with runnable --> load file
     // check header & file: -> return true if ok
-    private static boolean fileOK;
+    private boolean fileOK;
 
-    // ABSTRACT METHODES
-    @Override
-    public void run() {
-        // load
-        LoaderTiff.openTiffFile();
+    // CONSTRUCTOR
+    public LoaderTiff(Raster raster) {
+        this.raster = raster;
+        loader = new LoaderTiff.LoadThread();
+        openFileDialog();
     }
-
+    
     // PUBLIC FUNCTIONS
+    // get header informations
+    public boolean getHeader() {
+        readHeader();
+        return fileOK;
+    }
+    
+    // open file in thread
+    public void openFile() {
+        t1 = new Thread(loader);
+        t1.start();
+    }
+    
     // PRIVATE FUNCTIONS
-    // procedure to open file
-    private static void openTiffFile() {
+    // open file dialog
+    private void openFileDialog() {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("geoTiff-Datei", "tif");
         String defPath = DataLoader.getXMLdata("defaultPath");
         String path = MyUtilities.getOpenFileDialog("Datei öffnen", defPath, filter);
         if (path != null) {
             // set file path
-            LoaderTiff.tiffFile = new File(path);
-            // reset file status
-            LoaderTiff.resetFileStatus();
-            // check file header
-            LoaderTiff.readHeader();
-        }
-        // continue, if header is OK
-        if (fileOK) {
-            // init Raster
-            boolean isOK = RasterManager.mainRaster.initRaster();
-            if (isOK) {
-                // show header datas
-                MainFrame.showRasterValues();
-                // read file
-                LoaderTiff.readTiff();
-            } else {
-                // show text in gui
-                MainFrame.setText("Datenfeld Raster kann nicht initialisiert werden");
-            }
+            this.tiffFile = new File(path);
         }
     }
-
+ 
     // reset header status
-    private static void resetFileStatus() {
+    private void resetFileStatus() {
         fileOK = false;
-    }
-
+    } 
+    
     // ____READ FILE: 1. ONLY HEADER
     // check header of file
-    private static void readHeader() {
+    private void readHeader() {
         // status message
         String statusMsg = "Header OK";
         fileOK = true;
@@ -91,10 +89,10 @@ public class LoaderTiff implements Runnable {
                 reader.setInput(iis, true);
 
                 // size, pixel width, height
-                LoaderTiff.pixelW = reader.getWidth(0);
-                LoaderTiff.pixelH = reader.getHeight(0);
-                RasterManager.mainRaster.setNbCols(pixelW);
-                RasterManager.mainRaster.setNbRows(pixelH);
+                pixelW = reader.getWidth(0);
+                pixelH = reader.getHeight(0);
+                raster.setNbCols(pixelW);
+                raster.setNbRows(pixelH);
 
                 // read metadata of first image
                 IIOMetadata metadata = reader.getImageMetadata(0);
@@ -124,7 +122,7 @@ public class LoaderTiff implements Runnable {
                 <TIFFDouble value="0.5"/>       --> Rastergrösse Y
                 <TIFFDouble value="0.0"/>  */
                 double cellsize = val2.getAsDouble(0);
-                RasterManager.mainRaster.setCellsize(cellsize);
+                raster.setCellsize(cellsize);
                 if (val2.getAsDouble(0) != val2.getAsDouble(1)) {
                     statusMsg += "\nWarnung: Zellgrösse X und Y sind unterschiedlich";
                 }
@@ -132,7 +130,7 @@ public class LoaderTiff implements Runnable {
                 // set Bounds
                 double xMax = xMin + pixelH * cellsize;
                 double yMin = yMax - pixelW * cellsize;
-                RasterManager.mainRaster.setBounds(xMin, xMax, yMin, yMax);
+                raster.setBounds(xMin, xMax, yMin, yMax);
                 
                 // number of bands
                 int nbBands = reader.read(0).getRaster().getNumBands();
@@ -159,7 +157,7 @@ public class LoaderTiff implements Runnable {
 
     // ____READ FILE: 2. WHOLE FILE
     // read file
-    private static void readTiff() {
+    private void readFile() {
         String statusMsg = "Alles OK";
 
         // set ImageIO reader
@@ -183,7 +181,7 @@ public class LoaderTiff implements Runnable {
 
                     for (int y = 0; y < pixelH; y++) {
                         for (int x = 0; x < pixelW; x++) {
-                            RasterManager.mainRaster.setElement(y, x, data[x+y*pixelW]);
+                            raster.setElement(y, x, data[x+y*pixelW]);
                         }
                         // show progress
                         MainFrame.setText("Fortschritt: " + (int) (y * 100.0 / pixelH) + " %");
@@ -206,77 +204,93 @@ public class LoaderTiff implements Runnable {
         MainFrame.setText(statusMsg);
     }
 
-    private static void readAndDisplayMetadata() {
-        try {
-            ImageInputStream iis = ImageIO.createImageInputStream(tiffFile);
-            Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
 
-            if (readers.hasNext()) {
+    
+    // inner class with separate thrad
+    // loader for tiff-file
+    private class LoadThread implements Runnable {
+        @Override
+        public void run() {
+            LoaderTiff.this.readFile();
+        }
+    }
+    
+    // inner class:
+    // show tiff tags
+    private class TiffTagViewer {
+        
+        private void readAndDisplayMetadata() {
+            try {
+                ImageInputStream iis = ImageIO.createImageInputStream(LoaderTiff.this.tiffFile);
+                Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
 
-                // pick the first available ImageReader
-                ImageReader reader = readers.next();
+                if (readers.hasNext()) {
 
-                // attach source to the reader
-                reader.setInput(iis, true);
+                    // pick the first available ImageReader
+                    ImageReader reader = readers.next();
 
-                // read metadata of first image
-                IIOMetadata metadata = reader.getImageMetadata(0);
+                    // attach source to the reader
+                    reader.setInput(iis, true);
 
-                String[] names = metadata.getMetadataFormatNames();
-                int length = names.length;
+                    // read metadata of first image
+                    IIOMetadata metadata = reader.getImageMetadata(0);
+
+                    String[] names = metadata.getMetadataFormatNames();
+                    int length = names.length;
+                    for (int i = 0; i < length; i++) {
+                        System.out.println("Format name: " + names[i]);
+                        displayMetadata(metadata.getAsTree(names[i]));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void displayMetadata(Node root) {
+            displayMetadata(root, 0);
+        }
+
+        private void indent(int level) {
+            for (int i = 0; i < level; i++) {
+                System.out.print("    ");
+            }
+        }
+
+        private void displayMetadata(Node node, int level) {
+            // print open tag of element
+            indent(level);
+            System.out.print("<" + node.getNodeName());
+            NamedNodeMap map = node.getAttributes();
+            if (map != null) {
+
+                // print attribute values
+                int length = map.getLength();
                 for (int i = 0; i < length; i++) {
-                    System.out.println("Format name: " + names[i]);
-                    //displayMetadata(metadata.getAsTree(names[i]));
+                    Node attr = map.item(i);
+                    System.out.print(" " + attr.getNodeName()
+                            + "=\"" + attr.getNodeValue() + "\"");
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
-    private static void displayMetadata(Node root) {
-        displayMetadata(root, 0);
-    }
-
-    private static void indent(int level) {
-        for (int i = 0; i < level; i++) {
-            System.out.print("    ");
-        }
-    }
-
-    private static void displayMetadata(Node node, int level) {
-        // print open tag of element
-        indent(level);
-        System.out.print("<" + node.getNodeName());
-        NamedNodeMap map = node.getAttributes();
-        if (map != null) {
-
-            // print attribute values
-            int length = map.getLength();
-            for (int i = 0; i < length; i++) {
-                Node attr = map.item(i);
-                System.out.print(" " + attr.getNodeName()
-                        + "=\"" + attr.getNodeValue() + "\"");
+            Node child = node.getFirstChild();
+            if (child == null) {
+                // no children, so close element and return
+                System.out.println("/>");
+                return;
             }
-        }
 
-        Node child = node.getFirstChild();
-        if (child == null) {
-            // no children, so close element and return
-            System.out.println("/>");
-            return;
-        }
+            // children, so close current tag
+            System.out.println(">");
+            while (child != null) {
+                // print children recursively
+                displayMetadata(child, level + 1);
+                child = child.getNextSibling();
+            }
 
-        // children, so close current tag
-        System.out.println(">");
-        while (child != null) {
-            // print children recursively
-            displayMetadata(child, level + 1);
-            child = child.getNextSibling();
+            // print close tag of element
+            indent(level);
+            System.out.println("</" + node.getNodeName() + ">");
         }
-
-        // print close tag of element
-        indent(level);
-        System.out.println("</" + node.getNodeName() + ">");
     }
 }
