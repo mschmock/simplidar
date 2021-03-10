@@ -4,7 +4,7 @@
 package ch.manuel.simplidar.gui.panels;
 
 import ch.manuel.simplidar.gui.AnalyseFrame;
-import ch.manuel.simplidar.raster.DataManager;
+import ch.manuel.simplidar.raster.ClusterManager;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.JPanel;
@@ -44,7 +44,7 @@ public class ImgPanel extends JPanel {
     private void showLegende(Graphics2D g2) {
         // legend (in jPanel)
         Legend legend = new Legend( this );
-        double maxRough = DataManager.getMaxRoughness();
+        double maxRough = ClusterManager.getMaxRoughness();
         legend.setMaxVal( maxRough );           // max value
         legend.setLogScale( true );             // logarithmic scale
         // draw legend
