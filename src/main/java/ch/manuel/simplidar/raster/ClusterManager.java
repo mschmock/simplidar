@@ -68,15 +68,13 @@ public class ClusterManager {
         AnalyseFrame.setProgress(0);
     }
     
-    // PUBLIC FUNCTIONS
+    // PRIVATE FUNCTIONS
     // calculate max roughness
     private static void calcMaxRoughness() {
         maxRoughness = 0.0;
         
         for (int i = 0; i < sizeCluX; i++) {
             for (int j = 0; j < sizeCluY; j++) {
-                int colIndex = i*size;
-                int rowIndex = j*size;
                 // analyse starts with calling the constructor
                 double tmpRough = mainCluster[i][j].getRoughness();
                 if(tmpRough > maxRoughness ) {

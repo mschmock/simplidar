@@ -21,7 +21,7 @@ public class LoaderASC {
     // class attributes
     private static final Charset utf8 = StandardCharsets.UTF_8;
     private File ascFile;
-    private Raster raster;
+    private final Raster raster;
 //    private int nbRowsHeader;
     // load thread and object
     private Thread t1;                  // LOAD file thread
@@ -194,9 +194,10 @@ public class LoaderASC {
         // System.out.println( line + ": " + line.contains("ncols") );
         if (line.contains("ncols")) {
             // check value: Numeric int value on 2. position
-            int val = testLnInt(line);
+            String[] substr = line.split(" ");
             // if value ok -> write to class RasterData
-            if (val != 0) {
+            if (MyUtilities.isInteger(substr[1])) {
+                int val = Integer.parseInt(substr[1]);
                 raster.setNbCols(val);
                 statusHeader[0] = true;
             }
@@ -204,9 +205,10 @@ public class LoaderASC {
         // check for "nrows"
         if (line.contains("nrows")) {
             // check value: Numeric int value on 2. position
-            int val = testLnInt(line);
+            String[] substr = line.split(" ");
             // if value ok -> write to class RasterData
-            if (val != 0) {
+            if (MyUtilities.isInteger(substr[1])) {
+                int val = Integer.parseInt(substr[1]);
                 raster.setNbRows(val);
                 statusHeader[1] = true;
             }
@@ -214,9 +216,10 @@ public class LoaderASC {
         // check for "xllcorner"
         if (line.contains("xllcorner")) {
             // check value: Numeric int value on 2. position
-            int val = testLnInt(line);
+            String[] substr = line.split(" ");
             // if value ok -> write to class RasterData
-            if (val != 0) {
+            if (MyUtilities.isInteger(substr[1])) {
+                int val = Integer.parseInt(substr[1]);
                 raster.setXLLcorner(val);
                 statusHeader[2] = true;
             }
@@ -224,9 +227,10 @@ public class LoaderASC {
         // check for "yllcorner"
         if (line.contains("yllcorner")) {
             // check value: Numeric int value on 2. position
-            int val = testLnInt(line);
+            String[] substr = line.split(" ");
             // if value ok -> write to class RasterData
-            if (val != 0) {
+            if (MyUtilities.isInteger(substr[1])) {
+                int val = Integer.parseInt(substr[1]);
                 raster.setYLLcorner(val);
                 statusHeader[3] = true;
             }
@@ -234,9 +238,10 @@ public class LoaderASC {
         // check for "cellsize"
         if (line.contains("cellsize")) {
             // check value: Numeric int value on 2. position
-            double val = testLnDouble(line);
+            String[] substr = line.split(" ");
             // if value ok -> write to class RasterData
-            if (val != 0) {
+            if (MyUtilities.isNumeric(substr[1])) {
+                double val = Double.parseDouble(substr[1]);
                 raster.setCellsize(val);
                 statusHeader[4] = true;
             }
@@ -244,39 +249,14 @@ public class LoaderASC {
         // check for "nodata_value"
         if (line.contains("nodata_value")) {
             // check value: Numeric int value on 2. position
-            int val = testLnInt(line);
+            String[] substr = line.split(" ");
             // if value ok -> write to class RasterData
-            raster.setNoDataVal(val);
-            statusHeader[5] = true;
+            if (MyUtilities.isInteger(substr[1])) {
+                int val = Integer.parseInt(substr[1]);
+                raster.setNoDataVal(val);
+                statusHeader[5] = true;
+            }
         }
-    }
-
-    // returns null, if input is not ok
-    private static int testLnInt(String str) {
-        String[] substr;
-        substr = str.split(" ");
-
-        // 2. Element: int with nb of lines
-        if (!MyUtilities.isInteger(substr[1])) {
-            return 0;
-        }
-
-        // all OK
-        return Integer.parseInt(substr[1]);
-    }
-
-    // returns null, if input is not ok
-    private static double testLnDouble(String str) {
-        String[] substr;
-        substr = str.split(" ");
-
-        // 2. Element: int with nb of lines
-        if (!MyUtilities.isNumeric(substr[1])) {
-            return 0;
-        }
-
-        // all OK
-        return Double.parseDouble(substr[1]);
     }
 
     // inner class with separate thrad

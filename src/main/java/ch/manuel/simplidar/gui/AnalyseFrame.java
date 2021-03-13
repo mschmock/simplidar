@@ -4,6 +4,7 @@
 package ch.manuel.simplidar.gui;
 
 import ch.manuel.simplidar.calculation.RasterAnalyser;
+import ch.manuel.simplidar.gui.panels.Legend;
 import ch.manuel.simplidar.raster.ClusterManager;
 import ch.manuel.simplidar.raster.RasterManager;
 import java.awt.Color;
@@ -38,14 +39,16 @@ public class AnalyseFrame extends javax.swing.JFrame {
         AnalyseFrame.jProgressBar1.setValue(val);
     }
 
-    public static void repaintImg(boolean boo) {
-        AnalyseFrame.imgPanel.setHasLegend(boo);
+    public static void repaintImg() {
         AnalyseFrame.imgPanel.repaint();
     }
 
     // GETTER
     public static BufferedImage getImg() {
         return image;
+    }
+    public static Legend getLegend() {
+        return imgPanel.getLegend();
     }
 
     // PRIVATE FUNCTION

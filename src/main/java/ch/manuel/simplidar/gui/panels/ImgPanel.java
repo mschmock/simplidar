@@ -4,7 +4,6 @@
 package ch.manuel.simplidar.gui.panels;
 
 import ch.manuel.simplidar.gui.AnalyseFrame;
-import ch.manuel.simplidar.raster.ClusterManager;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.JPanel;
@@ -14,11 +13,11 @@ import javax.swing.JPanel;
 public class ImgPanel extends JPanel {
     
     // class attributes
-    private static boolean hasLegend;      // drawLegend yes / no
+    private static Legend legend;       // drawLegend yes / no
     
     // CONSTRUCTOR
     public ImgPanel() {
-        hasLegend = false;
+        ImgPanel.legend = new Legend( this );
     }
     
     @Override
@@ -28,25 +27,20 @@ public class ImgPanel extends JPanel {
         // draw image
         drawScaledImage(g);
         // draw legend
-        if(hasLegend) {
+        if(legend.isActive()) {
             showLegende(g2);
         }
     }
     
-    // PUBLIC FUNCTIONS
-    // set switch draw legend
-    public void setHasLegend(boolean boo) {
-        hasLegend = boo;
+    // GETTER
+    // return legend for further adaption
+    public Legend getLegend() {
+        return ImgPanel.legend;
     }
     
     // PRIVATE FUNCTIONS
     // draw legend
     private void showLegende(Graphics2D g2) {
-        // legend (in jPanel)
-        Legend legend = new Legend( this );
-        double maxRough = ClusterManager.getMaxRoughness();
-        legend.setMaxVal( maxRough );           // max value
-        legend.setLogScale( true );             // logarithmic scale
         // draw legend
         legend.drawLegend( g2 );
     }

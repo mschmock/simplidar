@@ -23,7 +23,7 @@ public class LoaderTiff {
 
     // class attributes
     private File tiffFile;
-    private Raster raster;
+    private final Raster raster;
     private int pixelW;
     private int pixelH;
     // load thread and object

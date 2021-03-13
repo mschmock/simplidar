@@ -3,9 +3,9 @@
 package ch.manuel.simplidar.calculation;
 
 import ch.manuel.simplidar.gui.AnalyseFrame;
+import ch.manuel.simplidar.gui.panels.Legend;
 import ch.manuel.simplidar.raster.Cluster;
 import ch.manuel.simplidar.raster.ClusterManager;
-import ch.manuel.simplidar.raster.RasterManager;
 import java.awt.Color;
 
 public class RasterAnalyser implements Runnable {
@@ -21,37 +21,31 @@ public class RasterAnalyser implements Runnable {
         // show result in image
         showInclination(true);
         // repaint img
-        AnalyseFrame.repaintImg(false);
+        AnalyseFrame.repaintImg();
     }
 
     // PUBLIC FUNCTIONS
     // draw information based on selection
     public static void updateImg(int selection) {
-        boolean drawLegend;
         // select case (drop down in AnalyseFrame.java)
         switch (selection) {
             case 0:
-                drawLegend = false;
                 showInclination(true);
                 break;
             case 1:
-                drawLegend = false;
                 showInclination(false);
                 break;
             case 2:
-                drawLegend = false;
                 showOrientation();
                 break;
             case 3:
-                drawLegend = true;
                 showRoughness();
                 break;
             default:
-                drawLegend = false;
                 showInclination(true);
         }
         // repaint img
-        AnalyseFrame.repaintImg(drawLegend);
+        AnalyseFrame.repaintImg();
     }
 
     // update dynamically 
@@ -75,33 +69,39 @@ public class RasterAnalyser implements Runnable {
             }
         }
         // repaint img: without legend -> false
-        AnalyseFrame.repaintImg(false);
+        AnalyseFrame.repaintImg();
     }
 
     
     // PRIVATE FUNCTIONS
-        // analyse cluster
+    // analyse cluster
     private static void startAnalyse() {
         ClusterManager.analyseCluster();
     }
     
     // show inclination of cluster element: true -> inclination from vertical
     private static void showInclination(boolean top) {
+        // set color-model for legend
+        double maxVal = top ? 90.0 : 180.0;
+        AnalyseFrame.getLegend().setLinearScale(0, maxVal);
+        AnalyseFrame.getLegend().setColorGray();
+        AnalyseFrame.getLegend().setActive();
+        
         int sizeX = ClusterManager.getClusterSizeX();
         int sizeY = ClusterManager.getClusterSizeY();
         for (int i = 0; i < sizeX; i++) {
             for (int j = 0; j < sizeY; j++) {
-                float incl;
+                float angle;
                 // inclination from vertical
                 if (top) {
-                    incl = 1.0f - ClusterManager.getElement(i, j).getInclinDEG() / 90.0f;
+                    angle = ClusterManager.getElement(i, j).getInclinDEG();
                     // inclination from sunbeam s-w
                 } else {
-                    incl = 1.0f - ClusterManager.getElement(i, j).getInclinSunDEG() / 180.0f;
+                    angle = ClusterManager.getElement(i, j).getInclinSunDEG();
                 }
 
                 // set pixel color in image
-                int col = Color.HSBtoRGB(0.6f, 0.1f, incl);
+                int col = AnalyseFrame.getLegend().colorFactory(angle).getRGB();
                 AnalyseFrame.getImg().setRGB(i, j, col);
             }
         }
@@ -140,7 +140,7 @@ public class RasterAnalyser implements Runnable {
 //                rg = (float) (Math.log(DataManager.getElement(i, j).getRoughness()) / Math.log(maxRough) );
                 rg = (float) (ClusterManager.getElement(i, j).getRoughness() / maxRough);
                 // set pixel color in image
-                int col = Color.HSBtoRGB(0.0f, 1.0f, rg);
+                int col = AnalyseFrame.getLegend().colorFactory(rg).getRGB();
                 AnalyseFrame.getImg().setRGB(i, j, col);
             }
         }
