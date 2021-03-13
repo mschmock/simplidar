@@ -3,7 +3,6 @@
 package ch.manuel.simplidar.calculation;
 
 import ch.manuel.simplidar.gui.AnalyseFrame;
-import ch.manuel.simplidar.gui.panels.Legend;
 import ch.manuel.simplidar.raster.Cluster;
 import ch.manuel.simplidar.raster.ClusterManager;
 import java.awt.Color;
@@ -27,6 +26,8 @@ public class RasterAnalyser implements Runnable {
     // PUBLIC FUNCTIONS
     // draw information based on selection
     public static void updateImg(int selection) {
+        // default: legend is inactive
+        AnalyseFrame.getLegend().setInactive();
         // select case (drop down in AnalyseFrame.java)
         switch (selection) {
             case 0:
@@ -109,18 +110,18 @@ public class RasterAnalyser implements Runnable {
 
     // show orientation of cluster: N - O - S - W
     private static void showOrientation() {
+        // set color-model for legend
+        AnalyseFrame.getLegend().setLinearScale(0, 360);
+        AnalyseFrame.getLegend().setColorTheme1();
+        AnalyseFrame.getLegend().setActive();
+        
         int sizeX = ClusterManager.getClusterSizeX();
         int sizeY = ClusterManager.getClusterSizeY();
         for (int i = 0; i < sizeX; i++) {
             for (int j = 0; j < sizeY; j++) {
 
-//                float degree = DataManager.getElement(i, j).getOrientEG() / 360.0f;
-                // set pixel color in image
-//                int col = Color.HSBtoRGB(0.3f, 1.0f, 2f * Math.abs(0.5f - degree));
-                double rad = ClusterManager.getElement(i, j).getOrientEG() / 180.0 * Math.PI;
-                int c1 = Math.round(255.0f * 0.5f * (float) (Math.sin(rad) + 1.0f));
-                int c2 = Math.round(255.0f * 0.5f * (float) (Math.cos(rad) + 1.0f));
-                int col = new Color(255, c1, c2).getRGB();
+                double angle = ClusterManager.getElement(i, j).getOrientEG();
+                int col = AnalyseFrame.getLegend().colorFactory(angle).getRGB();
                 AnalyseFrame.getImg().setRGB(i, j, col);
             }
         }
@@ -128,17 +129,19 @@ public class RasterAnalyser implements Runnable {
 
     // show roughness
     private static void showRoughness() {
+        // set color-model for legend
+        AnalyseFrame.getLegend().setLogScale(0.001, 50);
+        AnalyseFrame.getLegend().setColorGreenRed();
+        AnalyseFrame.getLegend().setActive();
+        
         int sizeX = ClusterManager.getClusterSizeX();
         int sizeY = ClusterManager.getClusterSizeY();
-        double maxRough = ClusterManager.getMaxRoughness();
+//        double maxRough = ClusterManager.getMaxRoughness();
 
         for (int i = 0; i < sizeX; i++) {
             for (int j = 0; j < sizeY; j++) {
-                float rg;
-
-                // roughness
-//                rg = (float) (Math.log(DataManager.getElement(i, j).getRoughness()) / Math.log(maxRough) );
-                rg = (float) (ClusterManager.getElement(i, j).getRoughness() / maxRough);
+                
+                double rg = ClusterManager.getElement(i, j).getRoughness();
                 // set pixel color in image
                 int col = AnalyseFrame.getLegend().colorFactory(rg).getRGB();
                 AnalyseFrame.getImg().setRGB(i, j, col);
