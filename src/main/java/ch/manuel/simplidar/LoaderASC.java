@@ -40,7 +40,16 @@ public class LoaderASC {
     // PUBLIC FUNCTIONS
     // get header informations
     public boolean getHeader() {
-        readHeader();
+        // reset file status
+        resetHeaderStatus();
+        if (this.ascFile != null) {
+            readHeader();
+        } else {
+            // no file defined
+            fileOK = false;
+            // show text in gui
+            MainFrame.setText("keine Datei ausgew\u00e4hlt");
+        }
         return (getHeaderStatus() && fileOK);
     }
     
@@ -78,8 +87,6 @@ public class LoaderASC {
     // ____READ FILE: 1. ONLY HEADER
     // check header of file
     private void readHeader() {
-        // reset file status
-        resetHeaderStatus();
         // status message
         String statusMsg = "Header OK";
         fileOK = true;

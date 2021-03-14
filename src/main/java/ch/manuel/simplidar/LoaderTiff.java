@@ -42,7 +42,14 @@ public class LoaderTiff {
     // PUBLIC FUNCTIONS
     // get header informations
     public boolean getHeader() {
-        readHeader();
+        if(this.tiffFile != null) {
+            readHeader();
+        } else {
+            // no file defined
+            fileOK = false;
+            // show text in gui
+            MainFrame.setText("keine Datei ausgew\u00e4hlt");
+        }
         return fileOK;
     }
     
@@ -67,7 +74,7 @@ public class LoaderTiff {
     // reset header status
     private void resetFileStatus() {
         fileOK = false;
-    } 
+    }
     
     // ____READ FILE: 1. ONLY HEADER
     // check header of file

@@ -54,6 +54,11 @@ public class RasterFrame extends javax.swing.JFrame {
         );
 
         jButton1.setText("Datei hinzufügen");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jTextField1.setText("Status...");
 
@@ -93,6 +98,10 @@ public class RasterFrame extends javax.swing.JFrame {
         RasterFrame.customPanel.repaintPanel();
 
     }//GEN-LAST:event_customPanelMouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
 
