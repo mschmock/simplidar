@@ -87,17 +87,19 @@ public class RasterAnalyser implements Runnable {
         AnalyseFrame.getLegend().setLinearScale(0, maxVal);
         AnalyseFrame.getLegend().setColorGray();
         AnalyseFrame.getLegend().setActive();
+        String label = top ? "Neigung der Fläche, Grad" : "Winkel, Grad";
+        AnalyseFrame.getLegend().setTitel(label);
         
         int sizeX = ClusterManager.getClusterSizeX();
         int sizeY = ClusterManager.getClusterSizeY();
         for (int i = 0; i < sizeX; i++) {
             for (int j = 0; j < sizeY; j++) {
                 float angle;
-                // inclination from vertical
                 if (top) {
+                    // inclination from vertical
                     angle = ClusterManager.getElement(i, j).getInclinDEG();
-                    // inclination from sunbeam s-w
                 } else {
+                    // inclination from sunbeam s-w
                     angle = ClusterManager.getElement(i, j).getInclinSunDEG();
                 }
 
@@ -114,6 +116,7 @@ public class RasterAnalyser implements Runnable {
         AnalyseFrame.getLegend().setLinearScale(0, 360);
         AnalyseFrame.getLegend().setColorTheme1();
         AnalyseFrame.getLegend().setActive();
+        AnalyseFrame.getLegend().setTitel("Orientierung, Grad");
         
         int sizeX = ClusterManager.getClusterSizeX();
         int sizeY = ClusterManager.getClusterSizeY();
@@ -133,6 +136,7 @@ public class RasterAnalyser implements Runnable {
         AnalyseFrame.getLegend().setLogScale(0.001, 50);
         AnalyseFrame.getLegend().setColorGreenRed();
         AnalyseFrame.getLegend().setActive();
+        AnalyseFrame.getLegend().setTitel("Rauigkeit, Meter");
         
         int sizeX = ClusterManager.getClusterSizeX();
         int sizeY = ClusterManager.getClusterSizeY();
