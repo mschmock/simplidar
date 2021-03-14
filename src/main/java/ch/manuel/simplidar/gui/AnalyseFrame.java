@@ -34,23 +34,27 @@ public class AnalyseFrame extends javax.swing.JFrame {
     }
 
     // PUBLIC FUNCTIONS
-    // set text in field
-    public static void setProgress(int val) {
-        AnalyseFrame.jProgressBar1.setValue(val);
-    }
-
     public static void repaintImg() {
         AnalyseFrame.imgPanel.repaint();
     }
-
+    public static Legend createLegend() {
+        Legend legend = new Legend(imgPanel);
+        imgPanel.setLegend(legend);
+        return legend;
+    }
+    
     // GETTER
     public static BufferedImage getImg() {
         return image;
     }
-    public static Legend getLegend() {
-        return imgPanel.getLegend();
-    }
+    
+    // SETTER
 
+    // set text in field
+    public static void setProgress(int val) {
+        AnalyseFrame.jProgressBar1.setValue(val);
+    }
+    
     // PRIVATE FUNCTION
     // fill image white
     private static void setPixels() {
@@ -169,10 +173,13 @@ public class AnalyseFrame extends javax.swing.JFrame {
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         // update image
+        imgPanel.resetLegend();
         RasterAnalyser.updateImg(jComboBox1.getSelectedIndex());
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void jSlider1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider1StateChanged
+        // update image: methode 2 with dynamic vue
+        imgPanel.resetLegend();
         RasterAnalyser.updateImg2(jSlider1.getValue());
     }//GEN-LAST:event_jSlider1StateChanged
 

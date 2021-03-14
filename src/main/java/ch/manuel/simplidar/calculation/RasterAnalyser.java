@@ -3,6 +3,7 @@
 package ch.manuel.simplidar.calculation;
 
 import ch.manuel.simplidar.gui.AnalyseFrame;
+import ch.manuel.simplidar.gui.panels.Legend;
 import ch.manuel.simplidar.raster.Cluster;
 import ch.manuel.simplidar.raster.ClusterManager;
 import java.awt.Color;
@@ -26,8 +27,6 @@ public class RasterAnalyser implements Runnable {
     // PUBLIC FUNCTIONS
     // draw information based on selection
     public static void updateImg(int selection) {
-        // default: legend is inactive
-        AnalyseFrame.getLegend().setInactive();
         // select case (drop down in AnalyseFrame.java)
         switch (selection) {
             case 0:
@@ -51,6 +50,12 @@ public class RasterAnalyser implements Runnable {
 
     // update dynamically 
     public static void updateImg2(int direction) {
+        // set color-model for legend
+        Legend leged = AnalyseFrame.createLegend();
+        leged.setLinearScale(0, 180);
+        leged.setColorGray();
+        leged.setTitel("Winkel, Grad");
+
         // update sunbeam direction
         Cluster.setSunbeamDirection(direction);
 
@@ -62,10 +67,10 @@ public class RasterAnalyser implements Runnable {
                 ClusterManager.getElement(i, j).recalcInclSun();
 
                 // inclination from sunbeam s-w
-                float incl = 1.0f - ClusterManager.getElement(i, j).getInclinSunDEG() / 180.0f;
+                float angle = ClusterManager.getElement(i, j).getInclinSunDEG();
 
                 // set pixel color in image
-                int col = Color.HSBtoRGB(0.6f, 0.1f, incl);
+                int col = leged.colorFactory(angle).getRGB();
                 AnalyseFrame.getImg().setRGB(i, j, col);
             }
         }
@@ -84,11 +89,11 @@ public class RasterAnalyser implements Runnable {
     private static void showInclination(boolean top) {
         // set color-model for legend
         double maxVal = top ? 90.0 : 180.0;
-        AnalyseFrame.getLegend().setLinearScale(0, maxVal);
-        AnalyseFrame.getLegend().setColorGray();
-        AnalyseFrame.getLegend().setActive();
+        Legend leged = AnalyseFrame.createLegend();
+        leged.setLinearScale(0, maxVal);
+        leged.setColorGray();
         String label = top ? "Neigung der Fläche, Grad" : "Winkel, Grad";
-        AnalyseFrame.getLegend().setTitel(label);
+        leged.setTitel(label);
         
         int sizeX = ClusterManager.getClusterSizeX();
         int sizeY = ClusterManager.getClusterSizeY();
@@ -99,12 +104,12 @@ public class RasterAnalyser implements Runnable {
                     // inclination from vertical
                     angle = ClusterManager.getElement(i, j).getInclinDEG();
                 } else {
-                    // inclination from sunbeam s-w
+                    // inclination from sunbeam
                     angle = ClusterManager.getElement(i, j).getInclinSunDEG();
                 }
 
                 // set pixel color in image
-                int col = AnalyseFrame.getLegend().colorFactory(angle).getRGB();
+                int col = leged.colorFactory(angle).getRGB();
                 AnalyseFrame.getImg().setRGB(i, j, col);
             }
         }
@@ -113,10 +118,10 @@ public class RasterAnalyser implements Runnable {
     // show orientation of cluster: N - O - S - W
     private static void showOrientation() {
         // set color-model for legend
-        AnalyseFrame.getLegend().setLinearScale(0, 360);
-        AnalyseFrame.getLegend().setColorTheme1();
-        AnalyseFrame.getLegend().setActive();
-        AnalyseFrame.getLegend().setTitel("Orientierung, Grad");
+        Legend leged = AnalyseFrame.createLegend();
+        leged.setLinearScale(0, 360);
+        leged.setColorTheme1();
+        leged.setTitel("Orientierung, Grad");
         
         int sizeX = ClusterManager.getClusterSizeX();
         int sizeY = ClusterManager.getClusterSizeY();
@@ -124,7 +129,7 @@ public class RasterAnalyser implements Runnable {
             for (int j = 0; j < sizeY; j++) {
 
                 double angle = ClusterManager.getElement(i, j).getOrientEG();
-                int col = AnalyseFrame.getLegend().colorFactory(angle).getRGB();
+                int col = leged.colorFactory(angle).getRGB();
                 AnalyseFrame.getImg().setRGB(i, j, col);
             }
         }
@@ -133,10 +138,10 @@ public class RasterAnalyser implements Runnable {
     // show roughness
     private static void showRoughness() {
         // set color-model for legend
-        AnalyseFrame.getLegend().setLogScale(0.001, 50);
-        AnalyseFrame.getLegend().setColorGreenRed();
-        AnalyseFrame.getLegend().setActive();
-        AnalyseFrame.getLegend().setTitel("Rauigkeit, Meter");
+        Legend leged = AnalyseFrame.createLegend();
+        leged.setLogScale(0.001, 50);
+        leged.setColorGreenRed();
+        leged.setTitel("Rauigkeit, Meter");
         
         int sizeX = ClusterManager.getClusterSizeX();
         int sizeY = ClusterManager.getClusterSizeY();
@@ -147,7 +152,7 @@ public class RasterAnalyser implements Runnable {
                 
                 double rg = ClusterManager.getElement(i, j).getRoughness();
                 // set pixel color in image
-                int col = AnalyseFrame.getLegend().colorFactory(rg).getRGB();
+                int col = leged.colorFactory(rg).getRGB();
                 AnalyseFrame.getImg().setRGB(i, j, col);
             }
         }

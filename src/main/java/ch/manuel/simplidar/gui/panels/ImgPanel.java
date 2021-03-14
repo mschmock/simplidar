@@ -17,7 +17,7 @@ public class ImgPanel extends JPanel {
     
     // CONSTRUCTOR
     public ImgPanel() {
-        ImgPanel.legend = new Legend( this );
+        ImgPanel.legend = null;
     }
     
     @Override
@@ -27,15 +27,18 @@ public class ImgPanel extends JPanel {
         // draw image
         drawScaledImage(g);
         // draw legend
-        if(legend.isActive()) {
+        if(legend != null) {
             showLegende(g2);
         }
     }
     
-    // GETTER
-    // return legend for further adaption
-    public Legend getLegend() {
-        return ImgPanel.legend;
+    // SETTER
+    // set legend for drawing
+    public void setLegend(Legend legend) {
+        ImgPanel.legend = legend;
+    }
+    public void resetLegend() {
+        ImgPanel.legend = null;
     }
     
     // PRIVATE FUNCTIONS

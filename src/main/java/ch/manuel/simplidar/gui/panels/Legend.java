@@ -14,7 +14,6 @@ public class Legend {
 
     // membervariables
     private ImgPanel imgPanel;
-    private boolean isActive;
     private int colorMode;
     // legend: geometry
     private final int LEN_SEGM = 20;
@@ -35,7 +34,6 @@ public class Legend {
     // CONSTRUCTOR
     public Legend(ImgPanel imgPanel) {
         this.imgPanel = imgPanel;
-        this.isActive = false;
         this.colorMode = 0;
         // format
         formatter = new DecimalFormat("###,##0.###");
@@ -51,15 +49,6 @@ public class Legend {
     }
 
     // PUBLIC FUNCTIONS
-    // set legend active / inactive
-    public void setActive() {
-        this.isActive = true;
-    }
-
-    public void setInactive() {
-        this.isActive = false;
-    }
-
     // set linear scale from xmin to xmax
     public void setLinearScale(double xMin, double xMax) {
         this.minValLegend = xMin;
@@ -93,10 +82,6 @@ public class Legend {
     }
 
     // GETTER
-    public boolean isActive() {
-        return this.isActive;
-    }
-
     /*Mode:
     0:  gray linear
     1:  red to green log
