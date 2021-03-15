@@ -151,13 +151,18 @@ public class MyUtilities {
     
     // Dialog zum Speichern der Datei (wird von der Methode "saveFile()" aufgerufen
     public static String getOpenFileDialog(String title, String defDir, FileNameExtensionFilter filter) {
+        FileNameExtensionFilter[] filters = {filter};
+        return getOpenFileDialog(title, defDir, filters);
+    }
+    public static String getOpenFileDialog(String title, String defDir, FileNameExtensionFilter[] filters) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle(title);
         fileChooser.setCurrentDirectory(new File( defDir ));
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY );
- 
-        fileChooser.addChoosableFileFilter(filter);
- 
+        
+        for(FileNameExtensionFilter filter : filters ) {
+            fileChooser.addChoosableFileFilter(filter);
+        }
         fileChooser.setAcceptAllFileFilterUsed(true);
  
         int result = fileChooser.showOpenDialog(null);

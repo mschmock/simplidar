@@ -36,13 +36,12 @@ public class LoaderTiff {
     public LoaderTiff(Raster raster) {
         this.raster = raster;
         loader = new LoaderTiff.LoadThread();
-        openFileDialog();
     }
-    
+
     // PUBLIC FUNCTIONS
     // get header informations
     public boolean getHeader() {
-        if(this.tiffFile != null) {
+        if (this.tiffFile != null) {
             readHeader();
         } else {
             // no file defined
@@ -52,13 +51,23 @@ public class LoaderTiff {
         }
         return fileOK;
     }
-    
+
     // open file in thread
     public void openFile() {
         t1 = new Thread(loader);
         t1.start();
     }
-    
+
+    // set file
+    public void setFile(File file) {
+        this.tiffFile = file;
+    }
+
+    // open file chooser
+    public void chooseFile() {
+        openFileDialog();
+    }
+
     // PRIVATE FUNCTIONS
     // open file dialog
     private void openFileDialog() {
@@ -70,12 +79,12 @@ public class LoaderTiff {
             this.tiffFile = new File(path);
         }
     }
- 
+
     // reset header status
     private void resetFileStatus() {
         fileOK = false;
     }
-    
+
     // ____READ FILE: 1. ONLY HEADER
     // check header of file
     private void readHeader() {
@@ -115,7 +124,7 @@ public class LoaderTiff {
                 <TIFFDouble value="0.0"/> */
                 double xMin = 0;
                 double yMax = 0;
-                if( val != null) {
+                if (val != null) {
                     xMin = val.getAsDouble(3);
                     yMax = val.getAsDouble(4);
                 } else {
@@ -133,12 +142,12 @@ public class LoaderTiff {
                 if (val2.getAsDouble(0) != val2.getAsDouble(1)) {
                     statusMsg += "\nWarnung: Zellgrösse X und Y sind unterschiedlich";
                 }
-                
+
                 // set Bounds
                 double xMax = xMin + pixelH * cellsize;
                 double yMin = yMax - pixelW * cellsize;
                 raster.setBounds(xMin, xMax, yMin, yMax);
-                
+
                 // number of bands
                 int nbBands = reader.read(0).getRaster().getNumBands();
                 if (nbBands != 1) {
@@ -181,22 +190,22 @@ public class LoaderTiff {
                 DataBuffer dataBuffer = reader.read(0).getRaster().getDataBuffer();
                 DataBufferFloat dataBufferFloat = null;
                 if (dataBuffer instanceof DataBufferFloat) {
-                    dataBufferFloat = (DataBufferFloat)dataBuffer;
-                    
+                    dataBufferFloat = (DataBufferFloat) dataBuffer;
+
                     // copy data to array
                     float data[] = dataBufferFloat.getData();
 
                     for (int y = 0; y < pixelH; y++) {
                         for (int x = 0; x < pixelW; x++) {
-                            raster.setElement(y, x, data[x+y*pixelW]);
+                            raster.setElement(y, x, data[x + y * pixelW]);
                         }
                         // show progress
                         MainFrame.setText("Fortschritt: " + (int) (y * 100.0 / pixelH) + " %");
                     }
-                    
+
                     // status
                     statusMsg += "\nLaden abgeschlossen.";
-                    
+
                 } else {
                     fileOK = false;
                     statusMsg = "Datentyp muss Float sein!";
@@ -211,21 +220,20 @@ public class LoaderTiff {
         MainFrame.setText(statusMsg);
     }
 
-
-    
     // inner class with separate thrad
     // loader for tiff-file
     private class LoadThread implements Runnable {
+
         @Override
         public void run() {
             LoaderTiff.this.readFile();
         }
     }
-    
+
     // inner class:
     // show tiff tags
     private class TiffTagViewer {
-        
+
         private void readAndDisplayMetadata() {
             try {
                 ImageInputStream iis = ImageIO.createImageInputStream(LoaderTiff.this.tiffFile);

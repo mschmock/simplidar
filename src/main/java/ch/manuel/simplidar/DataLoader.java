@@ -27,6 +27,7 @@ public class DataLoader {
     // Membervariablen
     public static GeoData geoData;
     private static final Charset utf8 = StandardCharsets.UTF_8;
+//    private static final Charset winCharset = Charset.forName("windows-1250");
     // files in resources
     private static final String PATH_XML = "/data/appData.xml";
     private static final String PATH_GEODATA = "/data/geodata.json";

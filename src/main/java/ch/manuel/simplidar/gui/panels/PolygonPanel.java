@@ -32,10 +32,9 @@ public class PolygonPanel extends JPanel {
     private final AffineTransform tx;
     private static final int pxBORDER = 16;                     // border in pixel
     private static Map<Integer,Municipality> mapID;             // map with id of municipalities
-    // network
+    // other
+    private static boolean zoomOnRaster;
     private static Municipality selectedMunicip;
-    // draw per absolute or per 1'000?
-    private static boolean absoluteRes;
         
         
     // Constructor
@@ -43,9 +42,9 @@ public class PolygonPanel extends JPanel {
         super();
         
         // initialisation
-        PolygonPanel.absoluteRes = true;
+        zoomOnRaster = false;
         listPoly = new ArrayList<>();
-        mapID = new HashMap<Integer,Municipality>();
+        mapID = new HashMap<>();
         // get polygons from geoData
         initPolygons();
         // init transformation
@@ -78,6 +77,12 @@ public class PolygonPanel extends JPanel {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         
+        // draw selected municipality if selected
+        if( PolygonPanel.selectedMunicip != null ) {
+            fillMunicip(PolygonPanel.selectedMunicip, g2);
+        }
+        
+        // draw geodata if available
         if( DataLoader.geoData != null ) {
             // define transformation
             calcTransformation();
@@ -87,6 +92,8 @@ public class PolygonPanel extends JPanel {
             // draw raster bounds
             drawRasterBounds( g2 );
         }
+        
+        
     }
     
     // repaint on click
@@ -131,14 +138,17 @@ public class PolygonPanel extends JPanel {
         g2.setStroke(new BasicStroke(1));
         g2.setColor( Color.red );
         
-        double x = RasterManager.mainRaster.getXmin();
-        double y = RasterManager.mainRaster.getYmax();
-        double w = RasterManager.mainRaster.getXmax() - x;
-        double h = y - RasterManager.mainRaster.getYmin();
-        
-        Shape shape = this.tx.createTransformedShape( new Rectangle2D.Double(x, y, w, h) );
-        g2.draw(shape);            
+        int nb = RasterManager.getNumberOfRasters();
+        for (int i = 0; i < nb; i++) {
+            double x = RasterManager.getRasterFromList(i).getXmin();
+            double y = RasterManager.getRasterFromList(i).getYmax();
+            double w = RasterManager.getRasterFromList(i).getXmax() - x;
+            double h = y - RasterManager.getRasterFromList(i).getYmin();
 
+            Shape shape = this.tx.createTransformedShape( new Rectangle2D.Double(x, y, w, h) );
+            g2.draw(shape);            
+        }
+        
     }
     
     // draw infections per municipality
@@ -202,13 +212,13 @@ public class PolygonPanel extends JPanel {
 //    }
     
     // fill polygon of municipality i
-    private void fillMunicip(Graphics2D g2, int i, Color col) {
+    private void fillMunicip(Municipality municip, Graphics2D g2) {
         // color
-        g2.setColor( col );
+        g2.setColor( Color.lightGray );
         
         // prepare polygons
-        List<int[]> listPolyX = GeoData.getMunicip(i).getPolyX();
-        List<int[]> listPolyY = GeoData.getMunicip(i).getPolyY();
+        List<int[]> listPolyX = municip.getPolyX();
+        List<int[]> listPolyY = municip.getPolyY();
         int nb = listPolyX.size();
 
         // draw polygons
@@ -233,13 +243,4 @@ public class PolygonPanel extends JPanel {
         }
     }
     
-    // set draw absolute or per 1'000 inhabitants
-    public static void setAbsoluteResultats(boolean bool) {
-        PolygonPanel.absoluteRes = bool;
-    }
-    
-    // vue changed
-    public static void viewChanged() {
-        //legend.resetMaxVal();
-    }
 }

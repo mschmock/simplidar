@@ -2,6 +2,7 @@
 //Datum: 07.03.2021
 package ch.manuel.simplidar.gui;
 
+import ch.manuel.simplidar.raster.RasterManager;
 import java.awt.Point;
 
 
@@ -31,6 +32,7 @@ public class RasterFrame extends javax.swing.JFrame {
         customPanel = new ch.manuel.simplidar.gui.panels.PolygonPanel();
         jButton1 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("simpLidar");
@@ -62,6 +64,13 @@ public class RasterFrame extends javax.swing.JFrame {
 
         jTextField1.setText("Status...");
 
+        jButton2.setText("kombinieren");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -72,7 +81,9 @@ public class RasterFrame extends javax.swing.JFrame {
                     .addComponent(customPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 525, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 423, Short.MAX_VALUE)
                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -84,7 +95,8 @@ public class RasterFrame extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2))
                 .addContainerGap())
         );
 
@@ -100,14 +112,22 @@ public class RasterFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_customPanelMouseClicked
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        // add a raster
+        RasterManager.addFileToRaster();
+        RasterFrame.customPanel.repaintPanel();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // test
+        RasterManager.test();
+    }//GEN-LAST:event_jButton2ActionPerformed
 
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private static ch.manuel.simplidar.gui.panels.PolygonPanel customPanel;
     private static javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private static javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }

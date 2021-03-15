@@ -34,7 +34,6 @@ public class LoaderASC {
     public LoaderASC(Raster raster) {
         this.raster = raster;
         loader = new LoadThread();
-        openFileDialog();
     }
 
     // PUBLIC FUNCTIONS
@@ -57,6 +56,16 @@ public class LoaderASC {
     public void openFile() {
         t1 = new Thread(loader);
         t1.start();
+    }
+    
+    // set file
+    public void setFile(File file) {
+        this.ascFile = file;
+    }
+    
+    // open file chooser
+    public void chooseFile() {
+        openFileDialog();
     }
     
     // PRIVATE FUNCTIONS
