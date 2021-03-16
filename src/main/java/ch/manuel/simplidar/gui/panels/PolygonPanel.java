@@ -33,7 +33,8 @@ public class PolygonPanel extends JPanel {
     private static final int pxBORDER = 16;                     // border in pixel
     private static Map<Integer,Municipality> mapID;             // map with id of municipalities
     // other
-    private static boolean zoomOnRaster;
+    private boolean zoomOnRaster;
+    private double zoomLvl;
     private static Municipality selectedMunicip;
         
         
@@ -43,6 +44,7 @@ public class PolygonPanel extends JPanel {
         
         // initialisation
         zoomOnRaster = false;
+        zoomLvl = 1;
         listPoly = new ArrayList<>();
         mapID = new HashMap<>();
         // get polygons from geoData
@@ -92,8 +94,6 @@ public class PolygonPanel extends JPanel {
             // draw raster bounds
             drawRasterBounds( g2 );
         }
-        
-        
     }
     
     // repaint on click
@@ -102,24 +102,69 @@ public class PolygonPanel extends JPanel {
         this.repaint();
     }
     
-    // calculate transformation matrx (translation, scale, mirror...)
+    // zoom on raster
+    public void setZoomOnRaster(boolean bool) {
+        this.zoomOnRaster = bool;
+    }
+    
+    public void zoomIn() {
+        this.zoomLvl = zoomLvl*1.5;
+    }
+    public void zoomOut() {
+        this.zoomLvl = zoomLvl/1.5;
+    }
+    
+
+    
+    // calculate transformation matrix (translation, scale, mirror...)
     private void calcTransformation() {
-        double wd = DataLoader.geoData.getWidth();
-        double hg = DataLoader.geoData.getHeight();
+        double wd;
+        double hg;
+        double xMin;
+        double yMin;
+        
+        if(zoomOnRaster) {
+            // zoom on raster
+            xMin = RasterManager.getBoundXmin();
+            yMin = RasterManager.getBoundYmin();
+            wd = RasterManager.getBoundXmax() - RasterManager.getBoundXmin();
+            hg = RasterManager.getBoundYmax() - RasterManager.getBoundYmin();
+        } else {
+            // zoom on geodata
+            xMin = DataLoader.geoData.getBoundX();
+            yMin = DataLoader.geoData.getBoundY();
+            wd = DataLoader.geoData.getWidth();
+            hg = DataLoader.geoData.getHeight();
+        }
+        
         
         double ratio1 = (this.getWidth() - (2 * pxBORDER)) / wd;
         double ratio2 = (this.getHeight()- (2 * pxBORDER)) / hg;
         double scaleFact = ( ratio1 < ratio2) ? ratio1 : ratio2;
         
-        AffineTransform trans = AffineTransform.getTranslateInstance( -DataLoader.geoData.getBoundX(), -DataLoader.geoData.getBoundY() );
+        AffineTransform trans = AffineTransform.getTranslateInstance( -xMin, -yMin );
         AffineTransform scale = AffineTransform.getScaleInstance( scaleFact, scaleFact );
         AffineTransform mirr_y = new AffineTransform( 1, 0, 0, -1, 0, this.getHeight() );
         AffineTransform trans2 = AffineTransform.getTranslateInstance( pxBORDER, -pxBORDER );
         tx.setToIdentity();
+        zoomTransformation();
         tx.concatenate(trans2);
         tx.concatenate(mirr_y);
         tx.concatenate(scale);
-        tx.concatenate(trans);
+        tx.concatenate(trans); 
+    }
+    
+    // set zoom transformation
+    private void zoomTransformation() {
+        double dx = this.getWidth()/2;
+        double dy = this.getHeight()/2;
+        
+        AffineTransform trans10 = AffineTransform.getTranslateInstance( -dx, -dy );
+        AffineTransform scale = AffineTransform.getScaleInstance(zoomLvl, zoomLvl );
+        AffineTransform trans01 = AffineTransform.getTranslateInstance( dx, dy );
+        tx.concatenate(trans01);
+        tx.concatenate(scale);
+        tx.concatenate(trans10);
     }
     
     // draw borders of municipalities
@@ -133,83 +178,34 @@ public class PolygonPanel extends JPanel {
         }  
     }
     
-    // draw borders of municipalities
+    // draw raster boundaries
     private void drawRasterBounds(Graphics2D g2) {
+        int nb = RasterManager.getNumberOfRasters();
+        // draw global bound (layer +1)
+        if( nb > 1 ) {
+            g2.setStroke(new BasicStroke(3));
+            g2.setColor( Color.green );
+            double x = RasterManager.getBoundXmin();
+            double y = RasterManager.getBoundYmin();
+            double w = RasterManager.getBoundXmax()- x;
+            double h = RasterManager.getBoundYmax()- y;
+
+            Shape shape = this.tx.createTransformedShape( new Rectangle2D.Double(x, y, w, h) );
+            g2.draw(shape); 
+        }
+        // draw single raster shapes (layer 0)
         g2.setStroke(new BasicStroke(1));
         g2.setColor( Color.red );
-        
-        int nb = RasterManager.getNumberOfRasters();
         for (int i = 0; i < nb; i++) {
             double x = RasterManager.getRasterFromList(i).getXmin();
-            double y = RasterManager.getRasterFromList(i).getYmax();
+            double y = RasterManager.getRasterFromList(i).getYmin();
             double w = RasterManager.getRasterFromList(i).getXmax() - x;
-            double h = y - RasterManager.getRasterFromList(i).getYmin();
+            double h = RasterManager.getRasterFromList(i).getYmax() - y;
 
             Shape shape = this.tx.createTransformedShape( new Rectangle2D.Double(x, y, w, h) );
             g2.draw(shape);            
         }
-        
     }
-    
-    // draw infections per municipality
-//    private void drawInfections(Graphics2D g2) {
-//        
-//        Color col;
-//        // absolute or relative
-//        if( PolygonPanel.absoluteRes ) {
-//            // get max value
-//            int maxInfect = Municipality.getMaxInfections();
-//            // prepare legend
-//            legend.setMaxVal( maxInfect );        // max value
-//            legend.setLogScale( true );           // logarithmic scale
-//            // loop through municipalities
-//            for (int i = 0; i < GeoData.getNbMunicip(); i++) {
-//                // draw absoute number
-//                // choose color from legend
-//                col = legend.colorFactory( GeoData.getMunicip(i).getNbInfections() );
-//                // fill polygon
-//                fillMunicip( g2, i, col );
-//            }
-//        } else {
-//            // get max value
-//            float maxInfectPerInhab = Municipality.getMaxInfectPerInhab();
-//            // prepare legend
-//            legend.setMaxVal( maxInfectPerInhab );      // max value
-//            legend.setLogScale( false );                // logarithmic scale
-//            // loop through municipalities
-//            for (int i = 0; i < GeoData.getNbMunicip(); i++) {
-//                // draw per 1000 inhabitants
-//                // choose color from legend
-//                col = legend.colorFactory( GeoData.getMunicip(i).getNbInfectPerInhab() );
-//                // fill polygon
-//                fillMunicip( g2, i, col );
-//            }
-//        }
-//        // draw legend
-//        legend.drawLegend( g2 );
-//        // draw borders on top
-//        this.drawBorder(g2);      
-//    }
-        
-    // draw infections per municipality
-//    private void drawK0(Graphics2D g2) {
-//        
-//        Color col;
-//        // get max value
-//        legend.setMaxVal( Municipality.getMaxK0() );    // max value
-//        legend.setLogScale( false );                    // logarithmic scale
-//        // loop through municipalities
-//        for (int i = 0; i < GeoData.getNbMunicip(); i++) {
-//            // choose color from legend
-//            col = legend.colorFactory( GeoData.getMunicip(i).getK0() );
-//            // fill polygon
-//            fillMunicip( g2, i, col );
-//        }
-//        // draw legend
-//        legend.drawLegend( g2 );
-//        // draw borders on top
-//        this.drawBorder(g2);
-//    }
     
     // fill polygon of municipality i
     private void fillMunicip(Municipality municip, Graphics2D g2) {
@@ -237,7 +233,7 @@ public class PolygonPanel extends JPanel {
             Shape shape = this.tx.createTransformedShape( listPoly.get(i) );
             if( shape.contains(p) ) {
                 PolygonPanel.selectedMunicip = PolygonPanel.mapID.get(i);
-                RasterFrame.setStatus("Selected: " + PolygonPanel.mapID.get(i).getName() );
+                RasterFrame.setText("Selected: " + PolygonPanel.mapID.get(i).getName() );
                 break;
             }
         }

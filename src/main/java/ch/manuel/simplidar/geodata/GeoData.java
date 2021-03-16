@@ -26,7 +26,7 @@ public class GeoData {
     // Constructor
     public GeoData() {
         listMunicip = new ArrayList<>();
-        mapID = new HashMap<Integer,Municipality>();
+        mapID = new HashMap<>();
     }
     
     // Methode
