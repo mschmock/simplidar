@@ -4,7 +4,6 @@ package ch.manuel.simplidar.raster;
 
 import ch.manuel.simplidar.calculation.Point;
 
-
 // data-holder for raster
 public class Raster {
 
@@ -39,8 +38,8 @@ public class Raster {
     }
 
     // set value of element x,y 
-    public void setElement(int x, int y, double val) {
-        this.raster[x][y] = val;
+    public void setElement(int y, int x, double val) {
+        this.raster[y][x] = val;
     }
 
     // coordinate X für column-index
@@ -131,6 +130,10 @@ public class Raster {
 
     public int getNoDataVal() {
         return this.nodata_val;
+    }
+
+    public double getElement(int rows, int cols) {
+        return this.raster[rows][cols];
     }
 
     // PRIVATE FUNCTIONS

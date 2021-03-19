@@ -130,29 +130,37 @@ public class RasterManager {
         if (getNumberOfRasters() > 0) {
             isOK = checkIntegrity();
             
-            if( isOK ) {
+            if (isOK) {
                 int nb = getNumberOfRasters();
                 for (int i = 0; i < nb; i++) {
                     listRaster.get(i).raster.initRaster();         // init raster
-                    
+
                     String extAsc = "asc";
                     String extTiff = "tif";
                     File file = listRaster.get(i).file;
                     Raster raster = listRaster.get(i).raster;
-                    
+
                     // open asc-file
                     if (extAsc.equals(getFileExtension(file))) {
                         LoaderASC loadObjAsc = new LoaderASC(raster);
                         loadObjAsc.setFile(file);
                         loadObjAsc.openFile();                  // read data from file
+                        loadObjAsc.joinThread();                // wait ...
                     }
                     // open tif-file
                     if (extTiff.equals(getFileExtension(file))) {
                         LoaderTiff loadObjTif = new LoaderTiff(raster);
                         loadObjTif.setFile(file);
                         loadObjTif.openFile();                  // read data from file
+                        loadObjTif.joinThread();                // wait ...
                     }
                 }
+
+                // calculate offset of raster tiles
+                RasterManager.calcOffset();
+                
+                // copy values
+                RasterManager.copyToMainRaster();
             }
         }
     }
@@ -180,15 +188,15 @@ public class RasterManager {
     public static double getBoundXmin() {
         return xMin;
     }
-
+    
     public static double getBoundXmax() {
         return xMax;
     }
-
+    
     public static double getBoundYmin() {
         return yMin;
     }
-
+    
     public static double getBoundYmax() {
         return yMax;
     }
@@ -215,17 +223,17 @@ public class RasterManager {
         int nb = getNumberOfRasters();
         
         if (nb > 0) {
-            xMin = listRaster.get(0).raster.getXmin();
-            xMax = listRaster.get(0).raster.getXmax();
-            yMin = listRaster.get(0).raster.getYmin();
-            yMax = listRaster.get(0).raster.getYmax();
+            xMin = listRaster.get(0).getRaster().getXmin();
+            xMax = listRaster.get(0).getRaster().getXmax();
+            yMin = listRaster.get(0).getRaster().getYmin();
+            yMax = listRaster.get(0).getRaster().getYmax();
             
             if (nb > 1) {
                 for (int i = 1; i < nb; i++) {
-                    xMin = listRaster.get(i).raster.getXmin() < xMin ? listRaster.get(i).raster.getXmin() : xMin;
-                    xMax = listRaster.get(i).raster.getXmax() > xMax ? listRaster.get(i).raster.getXmax() : xMax;
-                    yMin = listRaster.get(i).raster.getYmin() < yMin ? listRaster.get(i).raster.getYmin() : yMin;
-                    yMax = listRaster.get(i).raster.getYmax() > yMax ? listRaster.get(i).raster.getYmax() : yMax;
+                    xMin = listRaster.get(i).getRaster().getXmin() < xMin ? listRaster.get(i).getRaster().getXmin() : xMin;
+                    xMax = listRaster.get(i).getRaster().getXmax() > xMax ? listRaster.get(i).getRaster().getXmax() : xMax;
+                    yMin = listRaster.get(i).getRaster().getYmin() < yMin ? listRaster.get(i).getRaster().getYmin() : yMin;
+                    yMax = listRaster.get(i).getRaster().getYmax() > yMax ? listRaster.get(i).getRaster().getYmax() : yMax;
                 }
             }
         }
@@ -238,10 +246,10 @@ public class RasterManager {
         // all raster same cellsize?
         boolean isOK = true;
         int nb = getNumberOfRasters();
-        double cellsize = listRaster.get(0).raster.getCellsize();
+        double cellsize = listRaster.get(0).getRaster().getCellsize();
         
         for (int i = 0; i < nb; i++) {
-            double cs = listRaster.get(i).raster.getCellsize();
+            double cs = listRaster.get(i).getRaster().getCellsize();
             // diff max tolerated: 0.1 mm
             if (Math.abs(cs - cellsize) > 0.0001) {
                 isOK = false;
@@ -254,16 +262,16 @@ public class RasterManager {
         boolean northOK, eastOK, southOK, westOK;
         for (int i = 0; i < nb; i++) {
             // check North
-            double north = listRaster.get(i).raster.getXmax();
+            double north = listRaster.get(i).getRaster().getXmax();
             northOK = compareBounds(north, i, 1);
             // check East
-            double east = listRaster.get(i).raster.getYmax();
+            double east = listRaster.get(i).getRaster().getYmax();
             eastOK = compareBounds(east, i, 2);
             // check North
-            double south = listRaster.get(i).raster.getXmin();
+            double south = listRaster.get(i).getRaster().getXmin();
             southOK = compareBounds(south, i, 3);
             // check North
-            double west = listRaster.get(i).raster.getYmin();
+            double west = listRaster.get(i).getRaster().getYmin();
             westOK = compareBounds(west, i, 4);
             
             if (!(northOK && eastOK && southOK && westOK)) {
@@ -319,20 +327,20 @@ public class RasterManager {
                 
                 switch (face) {
                     case 1:         // north -> compare to south
-                        valBound2 = listRaster.get(j).raster.getXmin();
+                        valBound2 = listRaster.get(j).getRaster().getXmin();
                         break;
                     case 2:         // east -> compare to west
-                        valBound2 = listRaster.get(j).raster.getYmin();
+                        valBound2 = listRaster.get(j).getRaster().getYmin();
                         break;
                     case 3:         // south -> compare to nord
-                        valBound2 = listRaster.get(j).raster.getXmax();
+                        valBound2 = listRaster.get(j).getRaster().getXmax();
                         break;
                     case 4:         // west -> compare to east
-                        valBound2 = listRaster.get(j).raster.getYmax();
+                        valBound2 = listRaster.get(j).getRaster().getYmax();
                         break;
                 }
                 if (Math.abs(valBound - valBound2) < 0.0001) {
-                    System.out.println("Compare raster " + i + " with " +j);
+                    System.out.println("Compare raster " + i + " with " + j);
                     System.out.println(i + ": " + valBound + ", j: " + valBound2);
                     boundOK = true;
                     break;
@@ -340,7 +348,66 @@ public class RasterManager {
             }
         }
         
-        return boundOK;        
+        return boundOK;
+    }
+    
+    private static void calcOffset() {
+        String msg = "Erstelle neues Raster...";
+        
+        int nb = getNumberOfRasters();
+        double cellsize = listRaster.get(0).getRaster().getCellsize();
+        
+        for (int i = 0; i < nb; i++) {
+            int offX = (int) Math.round((listRaster.get(i).getRaster().getXmin() - xMin) / cellsize);
+            int offY = (int) Math.round((yMax - listRaster.get(i).getRaster().getYmax()) / cellsize);
+            msg += "\nOffset Raster " + i + " : x -> " + offX + ", y -> " + offY;
+            
+            listRaster.get(i).offsetX = offX;
+            listRaster.get(i).offsetY = offY;
+            
+            int rows = listRaster.get(i).getRaster().getNbRows();
+            int cols = listRaster.get(i).getRaster().getNbCols();
+//            int rows2 = (int) Math.round( (listRaster.get(i).raster.getYmax() - listRaster.get(i).raster.getYmin())/cellsize);
+//            int cols2 = (int) Math.round( (listRaster.get(i).raster.getXmax() - listRaster.get(i).raster.getXmin())/cellsize);
+            msg += "\n" + i + ", Rastergr\u00f6sse :" + cols + " x " + rows;
+            
+        }
+        System.out.print(msg);
+    }
+
+    // copy values from list to main raster
+    private static void copyToMainRaster() {
+        int nb = getNumberOfRasters();
+        // init main raster
+        // define rows, columns
+        double cellsize = listRaster.get(0).getRaster().getCellsize();
+        int glCols = (int) Math.round((xMax - xMin) / cellsize);
+        int glRows = (int) Math.round((yMax - yMin) / cellsize);
+        mainRaster.setNbCols(glCols);
+        mainRaster.setNbRows(glRows);
+//        msg = "Erwartete Rastergr\u00f6sse: " + glCols + " x " + glRows; 
+        mainRaster.setCellsize(cellsize);
+        mainRaster.setXLLcorner(xMin);
+        mainRaster.setYLLcorner(yMin);
+        mainRaster.initRaster();
+        
+        // loop rasterlist 
+        for (int n = 0; n < nb; n++) {
+            int rows = listRaster.get(n).getRaster().getNbRows();
+            int cols = listRaster.get(n).getRaster().getNbCols();
+            
+            int offX = listRaster.get(n).offsetX;
+            int offY = listRaster.get(n).offsetY;
+            
+            // copy values
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    double val = listRaster.get(n).getRaster().getElement(i, j);
+                    mainRaster.setElement(i + offY, j + offX, val);
+                }
+            }
+        }    
+        MainFrame.showRasterValues();
     }
 
     // ******************************************
@@ -350,10 +417,12 @@ public class RasterManager {
         // raster objects
         private Raster raster;
         private File file;
-        private double offsetX;
-        private double offsetY;
-        
+        private int offsetX;        // raster offset in pixel
+        private int offsetY;        // raster offset in pixel
+
         ListElement(Raster raster, File file) {
+            this.offsetX = 0;
+            this.offsetY = 0;
             this.raster = raster;
             this.file = file;
         }
@@ -368,4 +437,5 @@ public class RasterManager {
         }
         
     }
+    
 }

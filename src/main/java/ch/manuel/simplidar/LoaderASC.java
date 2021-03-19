@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 // load lidar-datas from asc-file
@@ -56,6 +58,15 @@ public class LoaderASC {
     public void openFile() {
         t1 = new Thread(loader);
         t1.start();
+    }
+    
+    // wait for thread
+    public void joinThread() {
+        try {
+            t1.join();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(LoaderASC.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     // set file

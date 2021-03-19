@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
@@ -56,6 +58,15 @@ public class LoaderTiff {
     public void openFile() {
         t1 = new Thread(loader);
         t1.start();
+    }
+    
+        // wait for thread
+    public void joinThread() {
+        try {
+            t1.join();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(LoaderASC.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     // set file
@@ -220,6 +231,7 @@ public class LoaderTiff {
         MainFrame.setText(statusMsg);
     }
 
+    // *********************************************
     // inner class with separate thrad
     // loader for tiff-file
     private class LoadThread implements Runnable {
