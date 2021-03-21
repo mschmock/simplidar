@@ -203,7 +203,9 @@ public class PolygonPanel extends JPanel {
             double h = RasterManager.getRasterFromList(i).getYmax() - y;
 
             Shape shape = this.tx.createTransformedShape( new Rectangle2D.Double(x, y, w, h) );
-            g2.draw(shape);            
+            g2.draw(shape);
+            g2.setColor( new Color(255, 0, 0, 40) );
+            g2.fill(shape);
         }
     }
     

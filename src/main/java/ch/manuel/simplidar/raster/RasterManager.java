@@ -131,36 +131,10 @@ public class RasterManager {
             isOK = checkIntegrity();
             
             if (isOK) {
-                int nb = getNumberOfRasters();
-                for (int i = 0; i < nb; i++) {
-                    listRaster.get(i).raster.initRaster();         // init raster
+                Thread t1 = new Thread(new LoadThread());
+                t1.start();
 
-                    String extAsc = "asc";
-                    String extTiff = "tif";
-                    File file = listRaster.get(i).file;
-                    Raster raster = listRaster.get(i).raster;
 
-                    // open asc-file
-                    if (extAsc.equals(getFileExtension(file))) {
-                        LoaderASC loadObjAsc = new LoaderASC(raster);
-                        loadObjAsc.setFile(file);
-                        loadObjAsc.openFile();                  // read data from file
-                        loadObjAsc.joinThread();                // wait ...
-                    }
-                    // open tif-file
-                    if (extTiff.equals(getFileExtension(file))) {
-                        LoaderTiff loadObjTif = new LoaderTiff(raster);
-                        loadObjTif.setFile(file);
-                        loadObjTif.openFile();                  // read data from file
-                        loadObjTif.joinThread();                // wait ...
-                    }
-                }
-
-                // calculate offset of raster tiles
-                RasterManager.calcOffset();
-                
-                // copy values
-                RasterManager.copyToMainRaster();
             }
         }
     }
@@ -395,7 +369,7 @@ public class RasterManager {
         for (int n = 0; n < nb; n++) {
             int rows = listRaster.get(n).getRaster().getNbRows();
             int cols = listRaster.get(n).getRaster().getNbCols();
-            
+           
             int offX = listRaster.get(n).offsetX;
             int offY = listRaster.get(n).offsetY;
             
@@ -406,7 +380,8 @@ public class RasterManager {
                     mainRaster.setElement(i + offY, j + offX, val);
                 }
             }
-        }    
+        }
+        mainRaster.calcBounds();
         MainFrame.showRasterValues();
     }
 
@@ -438,4 +413,46 @@ public class RasterManager {
         
     }
     
+    // ******************************************
+    // INNER CLASS:
+    private static class LoadThread implements Runnable {
+
+        @Override
+        public void run() {
+            thradManager();
+        }
+        
+        private static void thradManager() {
+            int nb = getNumberOfRasters();
+            for (int i = 0; i < nb; i++) {
+                listRaster.get(i).raster.initRaster();         // init raster
+
+                String extAsc = "asc";
+                String extTiff = "tif";
+                File file = listRaster.get(i).file;
+                Raster raster = listRaster.get(i).raster;
+
+                // open asc-file
+                if (extAsc.equals(getFileExtension(file))) {
+                    LoaderASC loadObjAsc = new LoaderASC(raster);
+                    loadObjAsc.setFile(file);
+                    loadObjAsc.openFile();                  // read data from file
+                    loadObjAsc.joinThread();                // wait ...
+                }
+                // open tif-file
+                if (extTiff.equals(getFileExtension(file))) {
+                    LoaderTiff loadObjTif = new LoaderTiff(raster);
+                    loadObjTif.setFile(file);
+                    loadObjTif.openFile();                  // read data from file
+                    loadObjTif.joinThread();                // wait ...
+                }
+            }
+            // calculate offset of raster tiles
+            RasterManager.calcOffset();
+                
+            // copy values
+            RasterManager.copyToMainRaster();
+        }
+        
+    }
 }
