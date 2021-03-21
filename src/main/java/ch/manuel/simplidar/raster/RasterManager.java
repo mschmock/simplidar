@@ -78,39 +78,41 @@ public class RasterManager {
     // add raster (header info) to frame
     public static void addFileToRaster() {
         // select file
-        File file = openFileDialog();
-        if (file != null) {
-            String extAsc = "asc";
-            String extTiff = "tif";
-            // prepare raster
-            Raster raster = new Raster();
+        File[] files = openFileDialog();
+        for(File file : files) {
+            if (file != null) {
+                String extAsc = "asc";
+                String extTiff = "tif";
+                // prepare raster
+                Raster raster = new Raster();
 
-            // open asc-file
-            if (extAsc.equals(getFileExtension(file))) {
-                LoaderASC loadObjAsc = new LoaderASC(raster);
-                loadObjAsc.setFile(file);
-                // load header
-                boolean isOK;
-                isOK = loadObjAsc.getHeader();
-                if (isOK) {
-                    listRaster.add(new ListElement(raster, file));
+                // open asc-file
+                if (extAsc.equals(getFileExtension(file))) {
+                    LoaderASC loadObjAsc = new LoaderASC(raster);
+                    loadObjAsc.setFile(file);
+                    // load header
+                    boolean isOK;
+                    isOK = loadObjAsc.getHeader();
+                    if (isOK) {
+                        listRaster.add(new ListElement(raster, file));
+                    }
                 }
-            }
-            // open tif-file
-            if (extTiff.equals(getFileExtension(file))) {
-                LoaderTiff loadObjTif = new LoaderTiff(raster);
-                loadObjTif.setFile(file);
-                // load header
-                boolean isOK;
-                isOK = loadObjTif.getHeader();
-                if (isOK) {
-                    listRaster.add(new ListElement(raster, file));
+                // open tif-file
+                if (extTiff.equals(getFileExtension(file))) {
+                    LoaderTiff loadObjTif = new LoaderTiff(raster);
+                    loadObjTif.setFile(file);
+                    // load header
+                    boolean isOK;
+                    isOK = loadObjTif.getHeader();
+                    if (isOK) {
+                        listRaster.add(new ListElement(raster, file));
+                    }
                 }
+                // calculate bounds
+                calcBounds();
+                // show files in textarea
+                RasterFrame.setText(getFileNames());
             }
-            // calculate bounds
-            calcBounds();
-            // show files in textarea
-            RasterFrame.setText(getFileNames());
         }
     }
     
@@ -130,12 +132,12 @@ public class RasterManager {
         if (getNumberOfRasters() > 0) {
             isOK = checkIntegrity();
             
+            // load files in different threads
             if (isOK) {
                 Thread t1 = new Thread(new LoadThread());
                 t1.start();
-
-
             }
+            MainFrame.closeRasterFrame();
         }
     }
 
@@ -177,14 +179,12 @@ public class RasterManager {
 
     // PRIVATE FUNCTIONS
     // open file dialog
-    private static File openFileDialog() {
-        FileNameExtensionFilter filterA = new FileNameExtensionFilter("ASC Files", "asc");
-        FileNameExtensionFilter filterB = new FileNameExtensionFilter("geoTiff-Datei", "tif");
-        FileNameExtensionFilter[] filters = {filterA, filterB};
+    private static File[] openFileDialog() {
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC and geoTIF Files", "asc", "tif");
         String defPath = DataLoader.getXMLdata("defaultPath");
-        String path = MyUtilities.getOpenFileDialog("Datei öffnen", defPath, filters);
+        File[] files = MyUtilities.getOpenFileDialogMulti("Datei \u00d6cffnen", defPath, filter);
         
-        return (path != null) ? new File(path) : null;
+        return (files != null) ? files : null;
     }
 
     // get extension from file
@@ -449,9 +449,10 @@ public class RasterManager {
             }
             // calculate offset of raster tiles
             RasterManager.calcOffset();
-                
             // copy values
             RasterManager.copyToMainRaster();
+            // clear list
+            listRaster.clear();
         }
         
     }

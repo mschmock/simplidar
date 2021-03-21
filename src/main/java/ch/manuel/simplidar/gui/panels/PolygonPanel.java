@@ -193,9 +193,9 @@ public class PolygonPanel extends JPanel {
             Shape shape = this.tx.createTransformedShape( new Rectangle2D.Double(x, y, w, h) );
             g2.draw(shape); 
         }
-        // draw single raster shapes (layer 0)
+        // draw each raster shapes (layer 0)
         g2.setStroke(new BasicStroke(1));
-        g2.setColor( Color.red );
+        
         for (int i = 0; i < nb; i++) {
             double x = RasterManager.getRasterFromList(i).getXmin();
             double y = RasterManager.getRasterFromList(i).getYmin();
@@ -203,9 +203,13 @@ public class PolygonPanel extends JPanel {
             double h = RasterManager.getRasterFromList(i).getYmax() - y;
 
             Shape shape = this.tx.createTransformedShape( new Rectangle2D.Double(x, y, w, h) );
-            g2.draw(shape);
+            
+            // filling
             g2.setColor( new Color(255, 0, 0, 40) );
             g2.fill(shape);
+            // border
+            g2.setColor( Color.red );
+            g2.draw(shape);
         }
     }
     

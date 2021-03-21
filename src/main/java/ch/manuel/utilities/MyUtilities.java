@@ -150,26 +150,38 @@ public class MyUtilities {
     }
     
     // Dialog zum Speichern der Datei (wird von der Methode "saveFile()" aufgerufen
-    public static String getOpenFileDialog(String title, String defDir, FileNameExtensionFilter filter) {
-        FileNameExtensionFilter[] filters = {filter};
-        return getOpenFileDialog(title, defDir, filters);
-    }
-    public static String getOpenFileDialog(String title, String defDir, FileNameExtensionFilter[] filters) {
+    public static File getOpenFileDialog(String title, String defDir, FileNameExtensionFilter filter) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle(title);
         fileChooser.setCurrentDirectory(new File( defDir ));
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY );
-        
-        for(FileNameExtensionFilter filter : filters ) {
-            fileChooser.addChoosableFileFilter(filter);
-        }
-        fileChooser.setAcceptAllFileFilterUsed(true);
+
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.addChoosableFileFilter(filter);
  
         int result = fileChooser.showOpenDialog(null);
  
         if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-            return selectedFile.getAbsolutePath();
+            return fileChooser.getSelectedFile();
+        } else {
+            return null;
+        }
+    }
+        // Dialog zum Speichern der Datei (wird von der Methode "saveFile()" aufgerufen
+    public static File[] getOpenFileDialogMulti(String title, String defDir, FileNameExtensionFilter filter) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle(title);
+        fileChooser.setMultiSelectionEnabled(true);
+        fileChooser.setCurrentDirectory(new File( defDir ));
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY );
+        
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.addChoosableFileFilter(filter);
+ 
+        int result = fileChooser.showOpenDialog(null);
+ 
+        if (result == JFileChooser.APPROVE_OPTION) {
+            return fileChooser.getSelectedFiles();
         } else {
             return null;
         }

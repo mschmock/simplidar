@@ -84,10 +84,10 @@ public class LoaderASC {
     private void openFileDialog() {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("ASC Files", "asc");
         String defPath = DataLoader.getXMLdata("defaultPath");
-        String path = MyUtilities.getOpenFileDialog("Datei öffnen", defPath, filter);
-        if (path != null) {
+        File file = MyUtilities.getOpenFileDialog("Datei \u00d6ffnen", defPath, filter);
+        if (file != null) {
             // set file path
-            this.ascFile = new File(path);
+            this.ascFile = file;
         }
     }
 

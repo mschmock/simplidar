@@ -26,8 +26,6 @@ public class LoaderTiff {
     // class attributes
     private File tiffFile;
     private final Raster raster;
-    private int pixelW;
-    private int pixelH;
     // load thread and object
     private Thread t1;                          // LOAD file thread
     private LoaderTiff.LoadThread loader;       // subclass with runnable --> load file
@@ -84,10 +82,10 @@ public class LoaderTiff {
     private void openFileDialog() {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("geoTiff-Datei", "tif");
         String defPath = DataLoader.getXMLdata("defaultPath");
-        String path = MyUtilities.getOpenFileDialog("Datei öffnen", defPath, filter);
-        if (path != null) {
+        File file = MyUtilities.getOpenFileDialog("Datei \u00d6ffnen", defPath, filter);
+        if (file != null) {
             // set file path
-            this.tiffFile = new File(path);
+            this.tiffFile = file;
         }
     }
 
@@ -116,8 +114,8 @@ public class LoaderTiff {
                 reader.setInput(iis, true);
 
                 // size, pixel width, height
-                pixelW = reader.getWidth(0);
-                pixelH = reader.getHeight(0);
+                int pixelW = reader.getWidth(0);
+                int pixelH = reader.getHeight(0);
                 raster.setNbCols(pixelW);
                 raster.setNbRows(pixelH);
 
@@ -204,6 +202,8 @@ public class LoaderTiff {
                     dataBufferFloat = (DataBufferFloat) dataBuffer;
 
                     // copy data to array
+                    int pixelW = reader.getWidth(0);
+                    int pixelH = reader.getHeight(0);
                     float data[] = dataBufferFloat.getData();
 
                     for (int y = 0; y < pixelH; y++) {

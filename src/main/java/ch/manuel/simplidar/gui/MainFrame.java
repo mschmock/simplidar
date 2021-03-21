@@ -51,6 +51,11 @@ public class MainFrame extends javax.swing.JFrame {
         sm = new SpinnerNumberModel(1, 1, RasterManager.mainRaster.getNbRows(), 1);               //default value,lower bound,upper bound,increment by
         MainFrame.jSpinner22.setModel(sm);
     }
+    
+    // close RasterFrame
+    public static void closeRasterFrame() {
+        rFrame.dispose();
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
