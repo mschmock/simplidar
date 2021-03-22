@@ -18,20 +18,17 @@ public class ClusterManager {
     private static Cluster[][] mainCluster;
     private static double maxRoughness;
     // thread objects
-    private static AnalyserThread thr1;
-    private static AnalyserThread thr2;
-    private static AnalyserThread thr3;
-    private static AnalyserThread thr4;
+    private static int progrThr1;
+    private static int progrThr2;
+    private static int progrThr3;
+    private static int progrThr4;
+    
     
     // CONSTRUCTOR
-    public ClusterManager() {
+//    public ClusterManager() {
 //        sizeCluX = 1;
 //        sizeCluY = 1;
-        thr1 = new AnalyserThread();
-        thr2 = new AnalyserThread();
-        thr3 = new AnalyserThread();
-        thr4 = new AnalyserThread();
-    }
+//    }
     
     
     // GETTER
@@ -69,38 +66,33 @@ public class ClusterManager {
         int j_min;
         int j_max;
         
-        // case 1
+        // prepare thread 1
         i_min = 0;
         i_max = Math.round(sizeCluX / 2.0f);
         j_min = 0;
         j_max = Math.round(sizeCluY / 2.0f);
-        Thread t1 = new Thread(thr1);
-        thr1.initQuadrant(i_min, i_max, j_min, j_max);
+        Thread t1 = new Thread(new AnalyserThread(i_min, i_max, j_min, j_max, 1));   
         
-        
-        // case 2
+        // prepare thread 2
         i_min = Math.round(sizeCluX / 2.0f);
         i_max = sizeCluX;
         j_min = 0;
         j_max = Math.round(sizeCluY / 2.0f);
-        Thread t2 = new Thread(thr2);
-        thr2.initQuadrant(i_min, i_max, j_min, j_max);
+        Thread t2 = new Thread(new AnalyserThread(i_min, i_max, j_min, j_max, 2)); 
         
-        // case 3
+        // prepare thread 3
         i_min = 0;
         i_max = Math.round(sizeCluX / 2.0f);
         j_min = Math.round(sizeCluY / 2.0f);
         j_max = sizeCluY;
-        Thread t3 = new Thread(thr3);
-        thr3.initQuadrant(i_min, i_max, j_min, j_max);
+        Thread t3 = new Thread(new AnalyserThread(i_min, i_max, j_min, j_max, 3)); 
         
-        // case 4
+        // prepare thread 4
         i_min = Math.round(sizeCluX / 2.0f);
         i_max = sizeCluX;
         j_min = Math.round(sizeCluY / 2.0f);
         j_max = sizeCluY;
-        Thread t4 = new Thread(thr4);
-        thr4.initQuadrant(i_min, i_max, j_min, j_max);
+        Thread t4 = new Thread(new AnalyserThread(i_min, i_max, j_min, j_max, 4)); 
         
         t1.start();
         t2.start();
@@ -137,10 +129,25 @@ public class ClusterManager {
             }
         }
     }
-    // status
-    private static void setStatus() {
+    
+    // status: mean from 4 threads
+    private static void setStatus(int nb, int progress) {
+        switch(nb) {
+            case 1:
+                progrThr1 = progress;
+                break;
+            case 2:
+                progrThr2 = progress;
+                break;
+            case 3:
+                progrThr3 = progress;
+                break;
+            case 4:
+                progrThr4 = progress;
+                break;
+        }
         float mean;
-        mean = (thr1.getProgress() + thr2.getProgress() + thr3.getProgress() + thr4.getProgress()) / 4.0f*100f;
+        mean = (progrThr1 + progrThr2 + progrThr3 + progrThr4) / 4.0f;
  
         // update progressbar
         AnalyseFrame.setProgress((int) mean);
@@ -153,6 +160,7 @@ public class ClusterManager {
         int i_max;
         int j_min;
         int j_max;
+        int threadNb;
         int progress;
         
         @Override
@@ -161,23 +169,15 @@ public class ClusterManager {
         }
         
         // CONSTRUCTOR
-        AnalyserThread() {
+        AnalyserThread(int i_min, int i_max, int j_min, int j_max, int nb) {
             this.progress = 0;
-        }
-        
-        // init quadrant
-        private void initQuadrant(int i_min, int i_max, int j_min, int j_max) {
             this.i_min = i_min;
             this.i_max = i_max;
             this.j_min = j_min;
             this.j_max = j_max;
+            this.threadNb = nb;
         }
-        
-        // get progress
-        private int getProgress() {
-            return this.progress;
-        }
-        
+ 
         // analyse cluster
         private void analyseCluster() {
             for (int i = i_min; i < i_max; i++) {
@@ -189,7 +189,7 @@ public class ClusterManager {
                 }
                 // set progress
                 progress = Math.round(100.0f*(i-i_min)/(i_max - i_min));
-                ClusterManager.setStatus();
+                ClusterManager.setStatus(threadNb, progress);
             }
         }
             
