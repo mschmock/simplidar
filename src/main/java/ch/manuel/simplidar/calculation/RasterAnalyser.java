@@ -15,7 +15,7 @@ public class RasterAnalyser implements Runnable {
     @Override
     public void run() {
         // start raster analyse
-        startAnalyse();
+        ClusterManager.startAnalyse();
         // show result in image
         showInclination(true);
         // repaint img
@@ -77,11 +77,6 @@ public class RasterAnalyser implements Runnable {
     }
 
     // PRIVATE FUNCTIONS
-    // analyse cluster
-    private static void startAnalyse() {
-        ClusterManager.analyseCluster();
-    }
-
     // show inclination of cluster element: true -> inclination from vertical
     private static void showInclination(boolean top) {
         // set color-model for legend

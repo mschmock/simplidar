@@ -286,6 +286,7 @@ public class LoaderASC {
         }
     }
 
+    //***********************************************************
     // inner class with separate thrad
     // loader for asc-file
     private class LoadThread implements Runnable {

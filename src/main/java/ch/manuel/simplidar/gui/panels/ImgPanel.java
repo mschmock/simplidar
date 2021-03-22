@@ -50,8 +50,14 @@ public class ImgPanel extends JPanel {
     
     // scale image
     private void drawScaledImage(Graphics g) {
-        int imgWidth = AnalyseFrame.getImg().getWidth(null);
-        int imgHeight = AnalyseFrame.getImg().getHeight(null);
+        int imgWidth = 1;
+        int imgHeight = 1;
+        try{
+            imgWidth = AnalyseFrame.getImg().getWidth(null);
+            imgHeight = AnalyseFrame.getImg().getHeight(null);
+        } catch(NullPointerException ex) {
+            
+        }
          
         double imgAspect = (double) imgHeight / imgWidth;
  
