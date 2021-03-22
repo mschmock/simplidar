@@ -3,13 +3,13 @@
 
 package ch.manuel.simplidar.raster;
 
-// Data-holder for clusters
 
 import ch.manuel.simplidar.gui.AnalyseFrame;
-import static ch.manuel.simplidar.raster.RasterManager.mainRaster;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
+// Data-holder for clusters
 public class ClusterManager {
     // cluster object
     private static final int size = 10;
@@ -51,8 +51,8 @@ public class ClusterManager {
     // PUBLIC FUNCTIONS
     // create data holder for mainCluster
     public static void initClusters() {
-        sizeCluX = mainRaster.getNbCols() / size;
-        sizeCluY = mainRaster.getNbRows() / size;
+        sizeCluX = RasterManager.mainRaster.getNbCols() / size;
+        sizeCluY = RasterManager.mainRaster.getNbRows() / size;
 
         mainCluster = new Cluster[sizeCluX][sizeCluY];
         
