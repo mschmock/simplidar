@@ -20,6 +20,7 @@ public class Raster {
 
     // raster data
     private double[][] raster;
+    private boolean[][] rasterBool;
 
     // CONSTRUCTOR
     public Raster() {
@@ -31,10 +32,16 @@ public class Raster {
     public boolean initRaster() {
         if (checkBounds()) {
             this.raster = new double[nbRows][nbCols];
+            this.rasterBool = null;
             return true;
         } else {
             return false;
         }
+    }
+    
+    // initialise boolean raster
+    public void initBoolRaster() {
+        this.rasterBool = new boolean[nbRows][nbCols];
     }
 
     // set value of element x,y 
@@ -134,6 +141,10 @@ public class Raster {
 
     public double getElement(int rows, int cols) {
         return this.raster[rows][cols];
+    }
+    
+    public boolean getElementBool(int rows, int cols) {
+        return this.rasterBool[rows][cols];
     }
 
     // PRIVATE FUNCTIONS
