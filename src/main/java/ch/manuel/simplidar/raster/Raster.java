@@ -3,6 +3,7 @@
 package ch.manuel.simplidar.raster;
 
 import ch.manuel.simplidar.calculation.Point;
+import java.util.Arrays;
 
 // data-holder for raster
 public class Raster {
@@ -42,11 +43,17 @@ public class Raster {
     // initialise boolean raster
     public void initBoolRaster() {
         this.rasterBool = new boolean[nbRows][nbCols];
+        Arrays.fill(this.rasterBool, true);
     }
 
     // set value of element x,y 
     public void setElement(int y, int x, double val) {
         this.raster[y][x] = val;
+    }
+    
+    // set value of boolRaster
+    public void setBoolElement(int y, int x, boolean val) {
+        this.rasterBool[y][x] = val;
     }
 
     // coordinate X für column-index

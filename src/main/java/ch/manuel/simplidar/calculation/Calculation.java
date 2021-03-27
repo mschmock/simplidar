@@ -20,7 +20,6 @@ public class Calculation {
     private int colMin;
     private int colMax;
 
-
     // CONSTURCTOR
     public Calculation() {
         cellsize = 3;
@@ -32,7 +31,7 @@ public class Calculation {
         initCalculation();
         startRunner();
     }
-    
+
     public void setTolerance(double tolerance) {
         Calculation.tolerance = tolerance;
     }
@@ -59,39 +58,45 @@ public class Calculation {
             for (int j = colMin; j < colMax; j++) {
                 // create triangles on specific index --> PointChecker
                 checkObj = new PointChecker(i, j);
-                checkObj.checkPtsInTriangle();
+                checkObj.checkIndexes();
             }
         }
     }
 
-
-
-
-
     //***********************************
     private class PointChecker {
-        
+
         // class attributes
         int row;
         int col;
-        int[] indexR;
-        int[] indexC;
-        
+        int[][] pointIndex;
+        int[][] edgeIndex;
+
         // triangles
         private Triangle triangle1;
         private Triangle triangle2;
         private Triangle triangle3;
         private Triangle triangle4;
-        
+
         PointChecker(int row, int col) {
             this.row = row;
             this.col = col;
-            
+
             createTriangles();
+
+            // size of index (points inside trinagle)
+            // edge has size (n+1) -> Elements (n+1)(n+2)/2 minus points
+            int nbElements = (cellsize + 1) * (cellsize + 2) / 2 - 3;
+            pointIndex = new int[2][nbElements];
+            edgeIndex = new int[2][3];
         }
-        
-        
+
         //FUNCTIONS
+        //      p2
+        //   /   |  \
+        // p3 - p0 -  p1
+        //   \   |  /
+        //      p4
         private void createTriangles() {
             Point p0 = RasterManager.mainRaster.getPoint(col, row);
             Point p1 = RasterManager.mainRaster.getPoint(col + cellsize, row);
@@ -108,47 +113,76 @@ public class Calculation {
             // rectangle 4 (4. Quadrant)
             triangle4 = new Triangle(p0, p4, p1);
         }
-        
-        private void createIndexes() {
+
+        private void checkIndexes() {
             // indexes for triangle 1
+            int n = 0;
             for (int i = 0; i < cellsize; i++) {
                 for (int j = 0; j <= (cellsize - i); j++) {
+                    if (i == 0 && j == 0) continue;
+                    if (i == 0 && (j == cellsize)) continue;
                     
+                    pointIndex[0][n] = i;
+                    pointIndex[1][n] = j;
+                    n++;
                 }
             }
+            edgeIndex[0][0] = col;
+            edgeIndex[1][0] = row;
+            edgeIndex[0][1] = col + cellsize;
+            edgeIndex[1][1] = row;
+            edgeIndex[0][2] = col;
+            edgeIndex[1][2] = row + cellsize;
+            
+            // check points inside traingle 1
+            boolean isWithinTolerance = checkPtsInTriangle(triangle1, pointIndex);
+            // if within tolerance -> remove points from boolean array
+            if( isWithinTolerance ) {
+                removePoints(pointIndex);
+                resetPoints(edgeIndex);
+            }
+            
         }
-        
-        private void checkPtsInTriangle() {
-            checkTri01();
-        }
-        
+
+
         // test points inside triangle
-        private void checkTri01() {
+        private boolean checkPtsInTriangle(Triangle tri, int[][] ind) {
             double dist;
-            boolean isWithinTolerance = true;
 
-            loop1:
-            for (int i = 0; i < cellsize; i++) {
-                for (int j = 0; j <= (cellsize - i); j++) {
-                    // check points
-                    Point p1 = RasterManager.mainRaster.getPoint(col + i, row + j);
-                    dist = triangle1.distPoint(p1);
+            int nbElements = (cellsize + 1) * (cellsize + 2) / 2 - 3;
+            
+            for (int i = 0; i < nbElements; i++) {
+                
+                // check points
+                Point p1 = RasterManager.mainRaster.getPoint(ind[0][i], ind[1][i]);
+                dist = tri.distPoint(p1);
 
-                    if(dist > tolerance) {
-                        isWithinTolerance = false;
-                        break loop1;
-                    }
+                if (dist > tolerance) {
+                    return false;
                 }
             }
-            
+            return true;
         }
         
-        
-        
-        
-        
-    }
+        private void removePoints(int[][] ind) {
+            int nbElements = (cellsize + 1) * (cellsize + 2) / 2 - 3;
             
+            for (int i = 0; i < nbElements; i++) {
+                RasterManager.mainRaster.setBoolElement(ind[0][i], ind[1][i], false);
+            }
+        }
+        
+        private void resetPoints(int[][] ind) {
+            int nbElements = 3;
+            for (int i = 0; i < nbElements; i++) {
+                RasterManager.mainRaster.setBoolElement(ind[0][i], ind[1][i], true);
+            }
+        }
+            
+        
+
+    }
+
     public static void testCalc(int x, int y) {
 
         Point point = RasterManager.mainRaster.getPoint(x - 1, y - 1);
