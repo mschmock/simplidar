@@ -3,7 +3,6 @@
 package ch.manuel.simplidar.raster;
 
 import ch.manuel.simplidar.calculation.Point;
-import java.util.Arrays;
 
 // data-holder for raster
 public class Raster {
@@ -39,18 +38,22 @@ public class Raster {
             return false;
         }
     }
-    
+
     // initialise boolean raster
     public void initBoolRaster() {
         this.rasterBool = new boolean[nbRows][nbCols];
-        Arrays.fill(this.rasterBool, true);
+        for (int i = 0; i < nbRows; i++) {
+            for (int j = 0; j < nbCols; j++) {
+                this.rasterBool[i][j] = true;
+            }
+        }
     }
 
     // set value of element x,y 
     public void setElement(int y, int x, double val) {
         this.raster[y][x] = val;
     }
-    
+
     // set value of boolRaster
     public void setBoolElement(int y, int x, boolean val) {
         this.rasterBool[y][x] = val;
@@ -74,7 +77,7 @@ public class Raster {
 
         return new Point(x, y, z);
     }
-
+  
     // calculate bounds xMax / yMax from xMin / yMin and cellsize
     public void calcBounds() {
         xMax = xMin + cellsize * nbCols;
@@ -149,9 +152,27 @@ public class Raster {
     public double getElement(int rows, int cols) {
         return this.raster[rows][cols];
     }
-    
+
     public boolean getElementBool(int rows, int cols) {
         return this.rasterBool[rows][cols];
+    }
+      
+    // get number of valid points in simp raster
+    public int getNumberPoints() {
+        int count = 0;
+        for (int i = 0; i < nbRows; i++) {
+            for (int j = 0; j < nbCols; j++) {
+                if( this.rasterBool[i][j]) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+    
+    // get number of pixels
+    public int getNbPixels() {
+        return nbRows * nbCols;
     }
 
     // PRIVATE FUNCTIONS

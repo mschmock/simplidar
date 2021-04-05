@@ -5,6 +5,7 @@ package ch.manuel.simplidar.calculation;
 import ch.manuel.simplidar.gui.MainFrame;
 import ch.manuel.simplidar.raster.RasterManager;
 import ch.manuel.utilities.MyUtilities;
+import java.text.DecimalFormat;
 
 public class Calculation {
 
@@ -23,6 +24,7 @@ public class Calculation {
     // CONSTURCTOR
     public Calculation() {
         cellsize = 3;
+        tolerance = 0.2;
     }
 
     // PUBLIC FUNCTIONS
@@ -30,6 +32,14 @@ public class Calculation {
     public void startCalculation() {
         initCalculation();
         startRunner();
+        
+        // print result
+        int nbPts = RasterManager.mainRaster.getNumberPoints();
+        int nbPixel = RasterManager.mainRaster.getNbPixels();
+        DecimalFormat myFormatter = new DecimalFormat("###,###");
+        msg = "Initial size: " + myFormatter.format(nbPixel) + "\n";
+        msg += "Simp size: " + myFormatter.format(nbPts);
+        MainFrame.setText(msg);
     }
 
     public void setTolerance(double tolerance) {
@@ -60,6 +70,7 @@ public class Calculation {
                 checkObj = new PointChecker(i, j);
                 checkObj.checkIndexes();
             }
+            System.out.println("Line " + i);
         }
     }
 
@@ -115,15 +126,19 @@ public class Calculation {
         }
 
         private void checkIndexes() {
-            // indexes for triangle 1
-            int n = 0;
+            int n;
+            boolean isWithinTolerance;
+            
+            // **********************
+            // indexes for triangle 1 (1. Quadrant)
+            n = 0;
             for (int i = 0; i < cellsize; i++) {
                 for (int j = 0; j <= (cellsize - i); j++) {
                     if (i == 0 && j == 0) continue;
                     if (i == 0 && (j == cellsize)) continue;
-                    
-                    pointIndex[0][n] = i;
-                    pointIndex[1][n] = j;
+
+                    pointIndex[0][n] = col + i;
+                    pointIndex[1][n] = row + j;
                     n++;
                 }
             }
@@ -133,53 +148,136 @@ public class Calculation {
             edgeIndex[1][1] = row;
             edgeIndex[0][2] = col;
             edgeIndex[1][2] = row + cellsize;
-            
+
             // check points inside traingle 1
-            boolean isWithinTolerance = checkPtsInTriangle(triangle1, pointIndex);
+            isWithinTolerance = checkPtsInTriangle(triangle1, pointIndex);
             // if within tolerance -> remove points from boolean array
-            if( isWithinTolerance ) {
+            if (isWithinTolerance) {
                 removePoints(pointIndex);
                 resetPoints(edgeIndex);
             }
             
-        }
+            // **********************
+            // indexes for triangle 2 (2. Quadrant)
+            n = 0;
+            for (int i = 0; i < cellsize; i++) {
+                for (int j = 0; j <= (cellsize - i); j++) {
+                    if (i == 0 && j == 0) continue;
+                    if (i == 0 && (j == cellsize)) continue;
 
+                    pointIndex[0][n] = col - i;
+                    pointIndex[1][n] = row + j;
+                    n++;
+                }
+            }
+            edgeIndex[0][0] = col;
+            edgeIndex[1][0] = row;
+            edgeIndex[0][1] = col - cellsize;
+            edgeIndex[1][1] = row;
+            edgeIndex[0][2] = col;
+            edgeIndex[1][2] = row + cellsize;
+
+            // check points inside traingle 2
+            isWithinTolerance = checkPtsInTriangle(triangle2, pointIndex);
+            // if within tolerance -> remove points from boolean array
+            if (isWithinTolerance) {
+                removePoints(pointIndex);
+                resetPoints(edgeIndex);
+            }
+            
+            // **********************
+            // indexes for triangle 3 (3. Quadrant)
+            n = 0;
+            for (int i = 0; i < cellsize; i++) {
+                for (int j = 0; j <= (cellsize - i); j++) {
+                    if (i == 0 && j == 0) continue;
+                    if (i == 0 && (j == cellsize)) continue;
+
+                    pointIndex[0][n] = col - i;
+                    pointIndex[1][n] = row - j;
+                    n++;
+                }
+            }
+            edgeIndex[0][0] = col;
+            edgeIndex[1][0] = row;
+            edgeIndex[0][1] = col - cellsize;
+            edgeIndex[1][1] = row;
+            edgeIndex[0][2] = col;
+            edgeIndex[1][2] = row - cellsize;
+
+            // check points inside traingle 3
+            isWithinTolerance = checkPtsInTriangle(triangle3, pointIndex);
+            // if within tolerance -> remove points from boolean array
+            if (isWithinTolerance) {
+                removePoints(pointIndex);
+                resetPoints(edgeIndex);
+            }
+            
+            // **********************
+            // indexes for triangle 4 (4. Quadrant)
+            n = 0;
+            for (int i = 0; i < cellsize; i++) {
+                for (int j = 0; j <= (cellsize - i); j++) {
+                    if (i == 0 && j == 0) continue;
+                    if (i == 0 && (j == cellsize)) continue;
+
+                    pointIndex[0][n] = col + i;
+                    pointIndex[1][n] = row - j;
+                    n++;
+                }
+            }
+            edgeIndex[0][0] = col;
+            edgeIndex[1][0] = row;
+            edgeIndex[0][1] = col + cellsize;
+            edgeIndex[1][1] = row;
+            edgeIndex[0][2] = col;
+            edgeIndex[1][2] = row - cellsize;
+
+            // check points inside traingle 4
+            isWithinTolerance = checkPtsInTriangle(triangle4, pointIndex);
+            // if within tolerance -> remove points from boolean array
+            if (isWithinTolerance) {
+                removePoints(pointIndex);
+                resetPoints(edgeIndex);
+            }
+
+        }
 
         // test points inside triangle
         private boolean checkPtsInTriangle(Triangle tri, int[][] ind) {
             double dist;
-
+//            System.out.println("Element " + col + " " + row);
             int nbElements = (cellsize + 1) * (cellsize + 2) / 2 - 3;
-            
+
             for (int i = 0; i < nbElements; i++) {
-                
+
                 // check points
                 Point p1 = RasterManager.mainRaster.getPoint(ind[0][i], ind[1][i]);
                 dist = tri.distPoint(p1);
 
-                if (dist > tolerance) {
+                if (Math.abs(dist) > tolerance) {
+//                    System.out.println("dist: " + dist + " in element " + i);
                     return false;
                 }
             }
+//            System.out.println("within distance");
             return true;
         }
-        
+
         private void removePoints(int[][] ind) {
             int nbElements = (cellsize + 1) * (cellsize + 2) / 2 - 3;
-            
+
             for (int i = 0; i < nbElements; i++) {
                 RasterManager.mainRaster.setBoolElement(ind[0][i], ind[1][i], false);
             }
         }
-        
+
         private void resetPoints(int[][] ind) {
             int nbElements = 3;
             for (int i = 0; i < nbElements; i++) {
                 RasterManager.mainRaster.setBoolElement(ind[0][i], ind[1][i], true);
             }
         }
-            
-        
 
     }
 

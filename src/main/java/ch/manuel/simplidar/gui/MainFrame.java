@@ -13,7 +13,9 @@ public class MainFrame extends javax.swing.JFrame {
     // frame: "analyseFrame"
     private static AnalyseFrame aFrame;         // analyseFrame
     private static RasterFrame rFrame;          // rasterFrame (merge + cut raster)
-
+    // calculation
+    private static Calculation calcObj;
+    
     // CONSTRUCTOR
     public MainFrame() {
         initComponents();
@@ -90,7 +92,7 @@ public class MainFrame extends javax.swing.JFrame {
         setTitle("simpLIDAR");
         setResizable(false);
 
-        jButton1.setText("Analyse");
+        jButton1.setText("SIMP");
         jButton1.setPreferredSize(new java.awt.Dimension(120, 32));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -232,7 +234,8 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        
+        calcObj = new Calculation();
+        calcObj.startCalculation();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
