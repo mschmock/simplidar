@@ -13,9 +13,12 @@ public class Triangle {
     private Point point3;
 
     private Vector3D normal;
+    
+    DecimalFormat myForm;
 
     // CONSTRUCTOR
     public Triangle(Point p1, Point p2, Point p3) {
+        myForm = new DecimalFormat("0.00");
         this.point1 = p1;
         this.point2 = p2;
         this.point3 = p3;
@@ -27,8 +30,17 @@ public class Triangle {
     // PUBLIC FUNCTIONS
     // get normal vector as string
     public String showNormal() {
-        DecimalFormat myFormatter = new DecimalFormat("0.000");
-        return this.normal.toString(myFormatter);
+        return this.normal.toString(myForm);
+    }
+    // print edges
+    public void printEdges() {
+        String str;
+        str =  myForm.format(point1.getX()) + "\t" + myForm.format(point1.getY())+ "\t" + myForm.format(point1.getZ());
+        System.out.println("Edge 1: " + str);
+        str =  myForm.format(point2.getX()) + "\t" + myForm.format(point2.getY())+ "\t" + myForm.format(point2.getZ());
+        System.out.println("Edge 2: " + str);
+        str =  myForm.format(point3.getX()) + "\t" + myForm.format(point3.getY())+ "\t" + myForm.format(point3.getZ());
+        System.out.println("Edge 3: " + str);
     }
 
     // calculate dist from point p
