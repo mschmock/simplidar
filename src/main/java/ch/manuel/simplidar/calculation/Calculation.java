@@ -22,8 +22,8 @@ public class Calculation {
 
     // CONSTURCTOR
     public Calculation() {
-        cellsize = 6;
-        tolerance = 0.2;
+        cellsize = 5;
+        tolerance = 0.1;
     }
 
     // PUBLIC FUNCTIONS
@@ -68,6 +68,9 @@ public class Calculation {
                 // create triangles on specific index --> PointChecker
                 checkObj = new PointChecker(i, j);
                 checkObj.checkIndexes();
+                if(checkObj.isWithinRange()) {
+                    j += cellsize - 1;
+                }
             }
             System.out.println("Line " + i);
         }
@@ -79,6 +82,7 @@ public class Calculation {
         // class attributes
         int row;
         int col;
+        // indices
         int[][] pointIndT1;
         int[][] pointIndT2;
         int[][] pointIndT3;
@@ -87,23 +91,24 @@ public class Calculation {
         int[][] edgeIndT2;
         int[][] edgeIndT3;
         int[][] edgeIndT4;
-
         // triangles
-        private Triangle triangle1;
-        private Triangle triangle2;
-        private Triangle triangle3;
-        private Triangle triangle4;
+        Triangle triangle1;
+        Triangle triangle2;
+        Triangle triangle3;
+        Triangle triangle4;
+        // boolean: is within tolerance
+        boolean isWithinT1;
+        boolean isWithinT2;
+        boolean isWithinT3;
+        boolean isWithinT4;
 
+        // CONSTRUCTOR
         PointChecker(int row, int col) {
             this.row = row;
             this.col = col;
 
-            createEdgeIndices();
-            createPointIndices();
-            createTriangles();
-
             // size of index (points inside trinagle)
-            // edge has size (n+1) -> Elements (n+1)(n+2)/2 minus points
+            // segment has size (n+1) -> Elements (n+1)(n+2)/2 minus edges
             int nbElements = (cellsize + 1) * (cellsize + 2) / 2 - 3;
             pointIndT1 = new int[2][nbElements];
             pointIndT2 = new int[2][nbElements];
@@ -113,6 +118,16 @@ public class Calculation {
             edgeIndT2 = new int[2][3];
             edgeIndT3 = new int[2][3];
             edgeIndT4 = new int[2][3];
+
+            isWithinT1 = false;
+            isWithinT2 = false;
+            isWithinT3 = false;
+            isWithinT4 = false;
+            
+            // create indices & triangles
+            createEdgeIndices();
+            createPointIndices();
+            createTriangles();
         }
 
         // FUNCTIONS
@@ -152,7 +167,7 @@ public class Calculation {
             edgeIndT4[0][2] = col - cellsize;
             edgeIndT4[1][2] = row;
         }
-        
+
         // create point indices
         private void createPointIndices() {
             int n;
@@ -205,7 +220,7 @@ public class Calculation {
                 }
             }
         }
-        
+
         // create triangels
         private void createTriangles() {
             Point p0 = RasterManager.mainRaster.getPoint(col, row);
@@ -224,78 +239,77 @@ public class Calculation {
         }
 
         private void checkIndexes() {
-            boolean isWithinTolerance;
-
-            // **********************
-            // indexes for triangle 1 (1. Quadrant)
-
-
             // check points inside traingle 1
-            isWithinTolerance = checkPtsInTriangle(triangle1, pointIndex);
-            // if within tolerance -> remove points from boolean array
-            if (isWithinTolerance) {
-                removePoints(pointIndex);
-                resetPoints(edgeIndex);
-            }
-
-            // **********************
-            // indexes for triangle 2 (2. Quadrant)
-
-
+            isWithinT1 = checkPtsInTriangle(triangle1, pointIndT1);
             // check points inside traingle 2
-            isWithinTolerance = checkPtsInTriangle(triangle2, pointIndex);
-            // if within tolerance -> remove points from boolean array
-            if (isWithinTolerance) {
-                removePoints(pointIndex);
-                resetPoints(edgeIndex);
+            isWithinT2 = checkPtsInTriangle(triangle2, pointIndT2);
+
+            // if T1 and T2 are within tolerance, T3 and T4 are obsolete
+            // if: remove these points
+            // else: check T3 and T4
+            if (isWithinT1 && isWithinT2) {
+                removePoints(pointIndT1);       // remove points in T1
+                resetPoints(edgeIndT1);         // reset edges T1
+                removePoints(pointIndT1);       // remove points in T2
+                resetPoints(edgeIndT1);         // reset edges T2
+            } else {
+                // check points inside traingle 3
+                isWithinT3 = checkPtsInTriangle(triangle3, pointIndT3);
+                // check points inside traingle 4
+                isWithinT4 = checkPtsInTriangle(triangle4, pointIndT4);
+
+                // if T3 and T4 are within tolerance
+                // if: remove these points
+                // else: check if one triangle is within range
+                if (isWithinT3 && isWithinT4) {
+                    removePoints(pointIndT3);       // remove points in T3
+                    resetPoints(edgeIndT3);         // reset edges T3
+                    removePoints(pointIndT4);       // remove points in T4
+                    resetPoints(edgeIndT4);         // reset edges T4
+                } else {
+                    // check if T1 OR T2 are within tolerance
+                    // else: check if T3 OR T4 are within tolerance
+                    if (isWithinT1 || isWithinT2) {
+                        if (isWithinT1) {
+                            removePoints(pointIndT1);       // remove points in T1
+                            resetPoints(edgeIndT1);         // reset edges T1
+                        } else {
+                            removePoints(pointIndT1);       // remove points in T2
+                            resetPoints(edgeIndT1);         // reset edges T2
+                        }
+                    } else if (isWithinT3 || isWithinT4) {
+                        if (isWithinT3) {
+                            removePoints(pointIndT3);       // remove points in T3
+                            resetPoints(edgeIndT3);         // reset edges T3
+                        } else {
+                            removePoints(pointIndT4);       // remove points in T4
+                            resetPoints(edgeIndT4);         // reset edges T4
+                        }
+                    }
+                }
             }
-
-            // **********************
-            // indexes for triangle 3 (3. Quadrant)
-
-
-            // check points inside traingle 3
-            isWithinTolerance = checkPtsInTriangle(triangle3, pointIndex);
-            // if within tolerance -> remove points from boolean array
-            if (isWithinTolerance) {
-                removePoints(pointIndex);
-                resetPoints(edgeIndex);
-            }
-
-            // **********************
-            // indexes for triangle 4 (4. Quadrant)
-
-            // check points inside traingle 4
-            isWithinTolerance = checkPtsInTriangle(triangle4, pointIndex);
-            // if within tolerance -> remove points from boolean array
-            if (isWithinTolerance) {
-                removePoints(pointIndex);
-                resetPoints(edgeIndex);
-            }
-
         }
 
         // test points inside triangle
         private boolean checkPtsInTriangle(Triangle tri, int[][] ind) {
             double dist;
-//            printIndex(edgeIndex);      //TEST
+
 //            tri.printEdges();           //TEST
             int nbElements = (cellsize + 1) * (cellsize + 2) / 2 - 3;
 
             for (int i = 0; i < nbElements; i++) {
 
                 // check points
-//                System.out.println("Element " + ind[0][i] + " " + ind[1][i]);
                 Point pt = RasterManager.mainRaster.getPoint(ind[0][i], ind[1][i]);
-//                pt.printPt();
+//                pt.printPt();     // TEST
                 dist = tri.distPoint(pt);
 
                 if (Math.abs(dist) > tolerance) {
-//                    System.out.println("dist: " + dist + " in element " + i);
+//                    System.out.println("dist: " + dist + " in element " + i);     //TEST
                     return false;
                 }
             }
-//            System.out.println("within distance");
+//            System.out.println("within distance");        //TEST
             return true;
         }
 
@@ -309,9 +323,9 @@ public class Calculation {
 
         private void resetPoints(int[][] ind) {
             int nbElements = 3;
-//            for (int i = 0; i < nbElements; i++) {
-//                RasterManager.mainRaster.setBoolElement(ind[0][i], ind[1][i], true);
-//            }
+            for (int i = 0; i < nbElements; i++) {
+                RasterManager.mainRaster.setBoolElement(ind[0][i], ind[1][i], true);
+            }
         }
 
         // array to string
@@ -326,22 +340,12 @@ public class Calculation {
             }
             System.out.println(msg);
         }
+        
+        // GETTER
+        private boolean isWithinRange() {
+            return isWithinT1 || isWithinT2 || isWithinT3 || isWithinT4;
+        }
 
     }
-
-    // Test
-    private static void createTriangle2() {
-        Point p1 = new Point(2, 7, 0);
-        Point p2 = new Point(0, 1, 9);
-        Point p3 = new Point(2, 0, 9);
-
-        Triangle triangle = new Triangle(p1, p2, p3);
-        msg += triangle.showNormal() + "\n";
-
-        msg += "Abstand Punkt:\n";
-        Point pP = new Point(5, -3, -4);
-        msg += "Berechnet: " + triangle.distPoint(pP) + "\n";
-
-    }
-
+    
 }
