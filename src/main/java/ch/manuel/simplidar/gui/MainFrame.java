@@ -5,8 +5,6 @@ package ch.manuel.simplidar.gui;
 import ch.manuel.simplidar.calculation.Calculation;
 import ch.manuel.simplidar.raster.RasterManager;
 import java.text.DecimalFormat;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
 
 public class MainFrame extends javax.swing.JFrame {
 
@@ -46,19 +44,13 @@ public class MainFrame extends javax.swing.JFrame {
         rasterData += "\nGrenzen X-Min: " + xMin + " / X-Max: " + xMax;        
         rasterData += "\nGrenzen Y-Min: " + yMin + " / Y-Max: " + yMax;        
         MainFrame.jTextArea2.setText(rasterData);
-        
-        // set spinner values
-        SpinnerModel sm = new SpinnerNumberModel(1, 1, RasterManager.mainRaster.getNbCols(), 1);  //default value,lower bound,upper bound,increment by
-        MainFrame.jSpinner21.setModel(sm);
-        sm = new SpinnerNumberModel(1, 1, RasterManager.mainRaster.getNbRows(), 1);               //default value,lower bound,upper bound,increment by
-        MainFrame.jSpinner22.setModel(sm);
     }
     
     // close RasterFrame
     public static void closeRasterFrame() {
         rFrame.dispose();
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -75,9 +67,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jLabel21 = new javax.swing.JLabel();
-        jLabel22 = new javax.swing.JLabel();
         jSpinner21 = new javax.swing.JSpinner();
-        jSpinner22 = new javax.swing.JSpinner();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea2 = new javax.swing.JTextArea();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -118,13 +108,9 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel12.setText("Status");
 
-        jLabel21.setText("Spalte wählen");
+        jLabel21.setText("Toleranz");
 
-        jLabel22.setText("Reihe wählen:");
-
-        jSpinner21.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
-
-        jSpinner22.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
+        jSpinner21.setModel(new javax.swing.SpinnerNumberModel(Float.valueOf(0.2f), Float.valueOf(0.01f), Float.valueOf(10.0f), Float.valueOf(0.01f)));
 
         jTextArea2.setEditable(false);
         jTextArea2.setColumns(20);
@@ -196,10 +182,7 @@ public class MainFrame extends javax.swing.JFrame {
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
                             .addComponent(jScrollPane2))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 196, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSpinner21, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel22, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jSpinner22, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(jSpinner21, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -213,10 +196,6 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jSpinner21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel22)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSpinner22, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
@@ -234,7 +213,10 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        float tolerance = (float) jSpinner21.getModel().getValue();
+        
         calcObj = new Calculation();
+        calcObj.setTolerance(tolerance);
         calcObj.startCalculation();
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -270,7 +252,6 @@ public class MainFrame extends javax.swing.JFrame {
     private static javax.swing.JLabel jLabel11;
     private static javax.swing.JLabel jLabel12;
     private static javax.swing.JLabel jLabel21;
-    private static javax.swing.JLabel jLabel22;
     private static javax.swing.JMenu jMenu1;
     private static javax.swing.JMenu jMenu2;
     private static javax.swing.JMenuBar jMenuBar1;
@@ -281,7 +262,6 @@ public class MainFrame extends javax.swing.JFrame {
     private static javax.swing.JScrollPane jScrollPane1;
     private static javax.swing.JScrollPane jScrollPane2;
     private static javax.swing.JSpinner jSpinner21;
-    private static javax.swing.JSpinner jSpinner22;
     private static javax.swing.JTextArea jTextArea1;
     private static javax.swing.JTextArea jTextArea2;
     // End of variables declaration//GEN-END:variables

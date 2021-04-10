@@ -13,24 +13,34 @@ public class Calculation {
     private static int cellsize;
     private static double tolerance;
     // size
-    private int nbRows;
-    private int nbCols;
-    private int rowMin;
-    private int rowMax;
-    private int colMin;
-    private int colMax;
+    private static int nbRows;
+    private static int nbCols;
+    // threads
+    private Thread t1;
+    private Thread t2;
+    private Thread t3;
+    private Thread t4;
+    private CalcRunner runner1;
+    private CalcRunner runner2;
+    private CalcRunner runner3;
+    private CalcRunner runner4;
 
     // CONSTURCTOR
     public Calculation() {
         cellsize = 5;
         tolerance = 0.1;
+        
+        runner1 = new Calculation.CalcRunner(1);
+        runner2 = new Calculation.CalcRunner(2);
+        runner3 = new Calculation.CalcRunner(3);
+        runner4 = new Calculation.CalcRunner(4);
     }
 
     // PUBLIC FUNCTIONS
     // start calculation: -> simplification
     public void startCalculation() {
         initCalculation();
-        startRunner();
+        startThreads();
 
         // print result
         int nbPts = RasterManager.mainRaster.getNumberPoints();
@@ -51,31 +61,101 @@ public class Calculation {
         nbRows = RasterManager.mainRaster.getNbRows();
         nbCols = RasterManager.mainRaster.getNbCols();
         RasterManager.mainRaster.initBoolRaster();
-
-        // bounds for runner
-        rowMin = cellsize;
-        rowMax = nbCols - cellsize;
-        colMin = cellsize;
-        colMax = nbRows - cellsize;
     }
+    
+    private void startThreads() {
+        t1 = new Thread(runner1);
+        t2 = new Thread(runner2);
+        t3 = new Thread(runner3);
+        t4 = new Thread(runner4);
+        t1.start();
+        t2.start();
+        t3.start();
+        t4.start();
+    }
+    
 
-    // run through raster 
-    private void startRunner() {
-        PointChecker checkObj;
 
-        for (int i = rowMin; i < rowMax; i++) {
-            for (int j = colMin; j < colMax; j++) {
-                // create triangles on specific index --> PointChecker
-                checkObj = new PointChecker(i, j);
-                checkObj.checkIndexes();
-                if(checkObj.isWithinRange()) {
-                    j += cellsize - 1;
+
+    //***********************************
+    private class CalcRunner implements Runnable {
+        
+        private int indexRunner;
+        private int rowMin;
+        private int rowMax;
+        private int colMin;
+        private int colMax;
+    
+        // CONSTRUCTOR
+        CalcRunner(int index) {
+            this.indexRunner = index;
+            setBounds(indexRunner);
+        }
+        
+        @Override
+        public void run() {
+            startRunner();
+        }
+        
+        // FUNCTIONS
+        // set bounds for runner
+        private void setBounds(int index) {
+            int rowSplit = nbRows / 2;
+            int colSplit = nbCols / 2;
+            
+            switch(index) {
+                case 1:
+                    rowMin = cellsize;
+                    rowMax = rowSplit;
+                    colMin = cellsize;
+                    colMax = colSplit;
+                    break;
+                case 2:
+                    rowMin = cellsize;
+                    rowMax = rowSplit;
+                    colMin = colSplit + cellsize;
+                    colMax = nbCols;
+                    break;
+                case 3:
+                    rowMin = rowSplit + cellsize;
+                    rowMax = nbRows;
+                    colMin = cellsize;
+                    colMax = colSplit;
+                    break;
+                case 4:
+                    rowMin = rowSplit + cellsize;
+                    rowMax = nbRows;
+                    colMin = colSplit + cellsize;
+                    colMax = nbCols;
+                    break;
+            }
+        }
+        
+        // run through raster 
+        private void startRunner() {
+            PointChecker checkObj;
+            
+
+            for (int size = 4; size <= 20; size++) {
+                cellsize = size;
+                this.setBounds(indexRunner);
+                
+                for (int i = rowMin; i < rowMax; i++) {
+                    for (int j = colMin; j < colMax; j++) {
+                        // create triangles on specific index --> PointChecker
+                        checkObj = new PointChecker(i, j);
+                        checkObj.checkIndexes();
+                        if(checkObj.isWithinRange()) {
+                            j += cellsize - 1;
+                        }
+                    }
+                    System.out.println("Size: " + size + ", Line " + i);
                 }
             }
-            System.out.println("Line " + i);
         }
+    
     }
-
+    
     //***********************************
     private class PointChecker {
 

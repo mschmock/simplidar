@@ -58,7 +58,7 @@ public class LoaderTiff {
         t1.start();
     }
     
-        // wait for thread
+    // wait for thread
     public void joinThread() {
         try {
             t1.join();
