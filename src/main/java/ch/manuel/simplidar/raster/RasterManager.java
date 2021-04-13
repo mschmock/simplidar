@@ -1,5 +1,5 @@
-//Autor: Manuel Schmocker
-//Datum: 13.02.2021
+// Autor: Manuel Schmocker
+// Datum: 13.02.2021
 package ch.manuel.simplidar.raster;
 
 import ch.manuel.simplidar.DataLoader;

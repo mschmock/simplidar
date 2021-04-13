@@ -24,7 +24,7 @@ public class Calculation {
     // CONSTURCTOR
     public Calculation() {
         tolerance = 0.1;
-                
+
         progrT1 = 0;
         progrT2 = 0;
         progrT3 = 0;
@@ -36,7 +36,7 @@ public class Calculation {
     public void startCalculation() {
         initCalculation();
         startThreadManager();
-        
+
     }
 
     public void setTolerance(double tolerance) {
@@ -50,24 +50,28 @@ public class Calculation {
         nbCols = RasterManager.mainRaster.getNbCols();
         RasterManager.mainRaster.initBoolRaster();
     }
-    
+
     // start threadmanager
     protected static void startThreadManager() {
         ThreadManager manager = new ThreadManager();
         Thread thread = new Thread(manager);
         thread.start();
     }
-    
+
     // print progress
-    protected static void printProgress() {
-        String msg;
-        msg = "Thread 1: " + progrT1 + " %\n";
-        msg += "Thread 2: " + progrT2 + " %\n";
-        msg += "Thread 3: " + progrT3 + " %\n";
-        msg += "Thread 4: " + progrT4 + " %\n";
+    protected static void printProgress(int index) {
+        String msg = "";
+        if (index <= 4) {
+            msg = "Thread 1: " + progrT1 + " %\n";
+            msg += "Thread 2: " + progrT2 + " %\n";
+            msg += "Thread 3: " + progrT3 + " %\n";
+            msg += "Thread 4: " + progrT4 + " %\n";
+        } else {
+            msg = "clean intersection...\nBitte warten...";
+        }
         MainFrame.setText(msg);
     }
-    
+
     // print result
     protected static void printResult() {
         String msg;
@@ -93,22 +97,31 @@ class ThreadManager implements Runnable {
     private static CalcRunner runner2;
     private static CalcRunner runner3;
     private static CalcRunner runner4;
-    
+    private static CalcRunner runner5;
+    private static CalcRunner runner6;
+
     // CONSTURCTOR
     public ThreadManager() {
         runner1 = new CalcRunner(1);
         runner2 = new CalcRunner(2);
         runner3 = new CalcRunner(3);
         runner4 = new CalcRunner(4);
+        // clean bounds
+        runner5 = new CalcRunner(5);
+        runner6 = new CalcRunner(6);
     }
-    
+
     @Override
     public void run() {
+        // clean raster
         startThreads();
         joinThreads();
+        // clean bounds
+        cleanBounds();
+
         Calculation.printResult();
     }
-    
+
     // start threads
     private static void startThreads() {
         t1 = new Thread(runner1);
@@ -120,7 +133,20 @@ class ThreadManager implements Runnable {
         t3.start();
         t4.start();
     }
-    
+
+    private static void cleanBounds() {
+        try {
+            t3 = new Thread(runner5);
+            t3.start();
+            t3.join();
+            t4 = new Thread(runner6);
+            t4.start();
+            t4.join();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ThreadManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     // joint threads
     private static void joinThreads() {
         try {
@@ -132,14 +158,13 @@ class ThreadManager implements Runnable {
             Logger.getLogger(Calculation.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-}
 
+}
 
 //***********************************
 class CalcRunner implements Runnable {
 
-    private int indexRunner;
+    private final int indexRunner;
     private int rowMin;
     private int rowMax;
     private int colMin;
@@ -161,7 +186,7 @@ class CalcRunner implements Runnable {
         int rowSplit = Calculation.nbRows / 2;
         int colSplit = Calculation.nbCols / 2;
 
-        switch(this.indexRunner) {
+        switch (this.indexRunner) {
             case 1:
                 rowMin = size;
                 rowMax = rowSplit;
@@ -184,6 +209,21 @@ class CalcRunner implements Runnable {
                 rowMin = rowSplit + size;
                 rowMax = Calculation.nbRows;
                 colMin = colSplit + size;
+                colMax = Calculation.nbCols;
+                break;
+            // clean intersection between bounds
+            // vertical
+            case 5:
+                rowMin = size;
+                rowMax = Calculation.nbRows;
+                colMin = colSplit;
+                colMax = colSplit + size;
+                break;
+            // horizontal
+            case 6:
+                rowMin = rowSplit;
+                rowMax = rowSplit + size;
+                colMin = size;
                 colMax = Calculation.nbCols;
                 break;
         }
@@ -202,20 +242,20 @@ class CalcRunner implements Runnable {
                     // create triangles on specific index --> PointChecker
                     checkObj = new PointChecker(i, j, size);
                     checkObj.checkIndexes();
-                    if(checkObj.isWithinRange()) {
+                    if (checkObj.isWithinRange()) {
                         j += size - 1;
                     }
                 }
-                System.out.println("Size: " + size + ", Line " + i);
+                System.out.println("T" + this.indexRunner + ", Size: " + size + ", Line " + i);
             }
-                
-            updateProgr( Math.round( ((size - 4)*100.0f) / ((float) (20 - 4)) ) );
+
+            updateProgr(Math.round(((size - 4) * 100.0f) / ((float) (20 - 4))));
         }
     }
 
     // update progress
-    private void updateProgr(int val) {            
-        switch(this.indexRunner) {
+    private void updateProgr(int val) {
+        switch (this.indexRunner) {
             case 1:
                 Calculation.progrT1 = val;
                 break;
@@ -229,7 +269,7 @@ class CalcRunner implements Runnable {
                 Calculation.progrT4 = val;
                 break;
         }
-        Calculation.printProgress();
+        Calculation.printProgress(this.indexRunner);
     }
 
 }
@@ -507,5 +547,3 @@ class PointChecker {
     }
 
 }
-
-

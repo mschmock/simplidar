@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ch.manuel</groupId>
     <artifactId>simpLIDAR</artifactId>
-    <version>0.9.13</version>
+    <version>0.9.14</version>
     <packaging>jar</packaging>
     
         <build>

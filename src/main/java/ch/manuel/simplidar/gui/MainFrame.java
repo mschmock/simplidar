@@ -2,6 +2,7 @@
 //Datum: 13.02.2021
 package ch.manuel.simplidar.gui;
 
+import ch.manuel.simplidar.DataWriter;
 import ch.manuel.simplidar.calculation.Calculation;
 import ch.manuel.simplidar.raster.RasterManager;
 import java.text.DecimalFormat;
@@ -74,6 +75,7 @@ public class MainFrame extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenuItem11 = new javax.swing.JMenuItem();
         jMenuItem12 = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem21 = new javax.swing.JMenuItem();
         jMenuItem22 = new javax.swing.JMenuItem();
@@ -134,6 +136,14 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu1.add(jMenuItem12);
+
+        jMenuItem1.setText("Punkte exportieren");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
 
         jMenuBar1.add(jMenu1);
 
@@ -245,6 +255,11 @@ public class MainFrame extends javax.swing.JFrame {
         MainFrame.openRasterFrame();
     }//GEN-LAST:event_jMenuItem22ActionPerformed
 
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // write points to text-file
+        DataWriter.savePoints();
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private static javax.swing.JButton jButton1;
@@ -255,6 +270,7 @@ public class MainFrame extends javax.swing.JFrame {
     private static javax.swing.JMenu jMenu1;
     private static javax.swing.JMenu jMenu2;
     private static javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private static javax.swing.JMenuItem jMenuItem11;
     private static javax.swing.JMenuItem jMenuItem12;
     private static javax.swing.JMenuItem jMenuItem21;
