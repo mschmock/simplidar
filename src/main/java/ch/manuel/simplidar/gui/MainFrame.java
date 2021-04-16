@@ -257,7 +257,8 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // write points to text-file
-        DataWriter.savePoints();
+        DataWriter myWriter = new DataWriter();
+        myWriter.savePoints();
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
 
