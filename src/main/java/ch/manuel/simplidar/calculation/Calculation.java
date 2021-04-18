@@ -246,6 +246,7 @@ class CalcRunner implements Runnable {
                         j += size - 1;
                     }
                 }
+                // TEST
                 System.out.println("T" + this.indexRunner + ", Size: " + size + ", Line " + i);
             }
 

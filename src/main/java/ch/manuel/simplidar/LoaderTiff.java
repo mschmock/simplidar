@@ -232,7 +232,7 @@ public class LoaderTiff {
     }
 
     // *********************************************
-    // inner class with separate thrad
+    // inner class with separate thread
     // loader for tiff-file
     private class LoadThread implements Runnable {
 

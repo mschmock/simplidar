@@ -3,32 +3,51 @@
 package ch.manuel.simplidar;
 
 // Class for data export
+import ch.manuel.simplidar.gui.MainFrame;
 import ch.manuel.simplidar.raster.RasterManager;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DataWriter {
+// Class: Write data (Points) to file
+public class DataWriter implements Runnable {
 
-    public static void savePoints() {
-        String nameDatei = getSaveFileDialog(new java.awt.Frame(), "Datei speichern", "D:\\", "POINTS.TXT");
+    // class attributes
+    private Thread thr1;
+    private static File saveFile;
+
+    @Override
+    public void run() {
+        startWriting();
+    }
+
+    public void savePoints() {
+        // save dialog
+        openFileDialog();
+
+        // start write thread
+        thr1 = new Thread(this);
+        thr1.start();
+    }
+
+    // PRIVATE FUNCTIONS
+    private static void openFileDialog() {
+        saveFile = getSaveFileDialog(new java.awt.Frame(), "Datei speichern", "D:\\");
+    }
+
+    private static void startWriting() {
 
         //Speichervorgang wird nur fortgesetzt, wenn der Pfad OK ist
-        if (!(nameDatei == null)) {
-//            //Endung ergänzen, falls notwendig
-//            String endDatei = nameDatei.substring(nameDatei.length() - Structure.FILE_EXT.length(), nameDatei.length());
-//            if ( !endDatei.equals(Structure.FILE_EXT) ){
-//                nameDatei = nameDatei + Structure.FILE_EXT;
-//            }
-
+        if (!(saveFile == null)) {
             DecimalFormat myFormatter = new DecimalFormat("0.000");
 
             // Textausgabe in die gewählte Datei
             try {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(nameDatei));
+                BufferedWriter bw = new BufferedWriter(new FileWriter(saveFile));
 
                 int nbRows = RasterManager.mainRaster.getNbRows();
                 int nbCols = RasterManager.mainRaster.getNbCols();
@@ -48,8 +67,8 @@ public class DataWriter {
                             bw.newLine();
 
                         }
-
                     }
+                    MainFrame.setText("Save " + Math.round(i * 100f / nbRows) + "%");
                 }
                 bw.close();
 
@@ -60,16 +79,23 @@ public class DataWriter {
     }
 
     // Dialog zum Speichern der Datei (wird von der Methode "saveFile()" aufgerufen
-    private static String getSaveFileDialog(java.awt.Frame f, String title, String defDir, String fileType) {
+    private static File getSaveFileDialog(java.awt.Frame f, String title, String defDir) {
+        String fileEnding = ".txt";
         java.awt.FileDialog fd = new java.awt.FileDialog(f, title, java.awt.FileDialog.SAVE);
-        fd.setFile(fileType);
+        fd.setFile("*" + fileEnding);
         fd.setDirectory(defDir);
         fd.setLocation(50, 50);
         fd.setVisible(true);
         if (fd.getDirectory() == null) {
             return null;
         } else {
-            return fd.getDirectory() + fd.getFile();
+            String fileName = fd.getFile();
+            if (!fileName.endsWith(fileEnding)) {
+                fileName = fileName + fileEnding;
+            }
+
+            return new File(fd.getDirectory(), fileName);
         }
     }
+
 }

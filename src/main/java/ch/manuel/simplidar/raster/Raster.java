@@ -55,7 +55,7 @@ public class Raster {
     }
 
     // set value of boolRaster
-    public void setBoolElement(int y, int x, boolean val) {
+    public void setBoolElement(int x, int y, boolean val) {
         this.rasterBool[y][x] = val;
     }
 
